@@ -13,8 +13,6 @@ setup.
 
 # TODO: full text search with a mongo text index *or something*
 
-# TODO: get this on github (and pypi?)
-
 
 import os
 import logging
