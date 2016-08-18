@@ -1,0 +1,10 @@
+*.pyc
+.project
+.pydevproject
+Thumbs.db
+.metadata
+venv
+current.config
+.testingdb.sqlite
+__pycache__
+postgresql-import.log

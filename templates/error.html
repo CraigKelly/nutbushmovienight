@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %} An Error just went down in Nutbush {% endblock %}
+{% block display_title %} ERROR {% endblock %}
+{% block display_title_sub %} I know it was you, Fredo {% endblock %}
+{% block main_content %}
+
+<div class="row">
+<div class="col-md-12">
+    <div class="error">{{ errortext }}</div>
+</div>
+</div>
+
+{% endblock %}

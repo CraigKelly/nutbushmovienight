@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="application-name" content="Nutbush Movie Night Web App">
+<meta name="keywords" content="movie,food,dinner,nutbush,memphis,awesome">
+<meta name="description" content="A web site for a very special weekly occurrence">
+<meta name="subject" content="Movies and food">
+
+<title>{% block title %}Nutbush Movie Night{% endblock %}</title>
+
+<link type="text/plain" rel="author" href="{{SITEURL}}/humans.txt" />
+
+<link href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="//cdn.datatables.net/responsive/1.0.3/css/dataTables.responsive.css" rel="stylesheet">
+<link href="//cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet">
+
+{# See helper.py where these variables are set #}
+{# See also main.py where the defaults are read from the config #}
+<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/{{jqueryui_theme}}/jquery-ui.css" rel="stylesheet" />
+<link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.6/{{bootswatch_theme}}/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/static/nutbush.css" type="text/css">
+</head>
+
+<body>
+
+<!-- HEADER/NAVBAR -->
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" href="{{url_for('main.main_page')}}">Nutbush Movie Night</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="{{url_for('main.night_display')}}">Nights</a></li>
+                <li><a href="{{url_for('main.movie_display')}}">Movies</a></li>
+                <li><a href="{{url_for('main.person_display')}}">People</a></li>
+                <li><a href="{{url_for('data.explore_data')}}">Explore</a></li>
+
+                {% if usr.admin %}
+                    <li><a href="{{url_for('main.night_display', datestr='add')}}">Add Movie Night</a></li>
+                {% endif %}
+
+                {% block extra_menu %}{% endblock %}
+            </ul>
+
+            {% if config['GOOGLE_AUTH'] %}
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    {% if usr.anon %}
+                        <a href="{{url_for('auth.login', redir=request.url)}}">Login</a>
+                    {% else %}
+                        <a href="{{url_for('auth.logout', redir=request.url)}}">Logout {{ usr.type }} {{ usr.name }}</a>
+                    {% endif %}
+                </li>
+                {% if usr.photo %}
+                    <li>
+                        <a class="logo" href="{{url_for('main.main_page')}}"><img src="{{usr.photo}}" class="img-user" /></a>
+                    </li>
+                {% endif %}
+            </ul>
+            {% endif %}
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-->
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container" style="padding-left:4%;">
+    <!-- Header -->
+    <div class="row">
+        <div class="page-header">
+            <h1>
+            {% block display_title %} Welcome! {% endblock %}
+            <small>{% block display_title_sub %}
+                Movie Night Abides.
+            {% endblock %}</small>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Messages to flash -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="row">
+            <div class="col-md-5">
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{message}}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-md-7">&nbsp;</div>
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block main_content %}
+
+    <div class="row">
+        <div class="col-md-2">
+            <h4>Options</h4>
+            {% if usr.admin %}
+            <p>
+                <a href="{{url_for('main.night_display', datestr='add')}}">Add Movie Night</a>
+            </p>
+            {% endif %}
+
+            <p><a href="{{url_for('main.night_display')}}">All Nights</a></p>
+            <p><a href="{{url_for('main.movie_display')}}">All Movies</a></p>
+            <p><a href="{{url_for('main.person_display')}}">All People</a></p>
+
+            <hr/>
+
+            <p><a href="{{url_for('data.explore_data')}}">Explore</a></p>
+            <p><a href="{{url_for('lawyer.about')}}">About</a></p>
+            <p><a href="{{url_for('lawyer.faq')}}">FAQ</a></p>
+
+            {% if config['GOOGLE_AUTH'] %}
+                <hr/>
+                <p>
+                {% if usr.anon %}
+                    <a href="{{url_for('auth.login', redir=request.url)}}">Login</a>
+                {% else %}
+                    <a href="{{url_for('auth.logout', redir=request.url)}}">Logout {{ usr.type }} {{ usr.name }}</a>
+                {% endif %}
+            {% endif %}
+            </p>
+        </div>
+
+        <div class="col-md-offset-1 col-md-9">
+            <h4>Recent Movie Nights</h4>
+
+            <div class="row">
+                {% for mn in movienights %}
+                    <div class="col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <a href="{{url_for('main.night_display', datestr=mn.datestr)}}">
+                                    <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>
+                                    {{mn.listdate}}
+                                </a>
+
+                                {% if usr.admin %}
+                                <span class="btn-group pull-right">
+                                    <a href="{{url_for('main.night_display', datestr=mn.datestr, mode='edit')}}" class="btn btn-sm btn-default">
+                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                        Edit
+                                    </a>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <a href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}">
+                                <img src="{{mn.thumb}}" class="img-responsive img-thumbnail img-movie-thumbnail pull-left" style="margin-right:1rem;">
+                            </a>
+
+                            <a href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}">
+                                {{mn.moviename}}
+                            </a>
+                            <br>
+                            Dinner:
+                            <a href="{{url_for('main.night_display', datestr=mn.datestr)}}">
+                                {{mn.dinner}}
+                            </a>
+                        </div>
+                    </div>
+                    </div>
+                    {% if loop.index % 2 == 0 %}
+                        <div class="clearfix"></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% endblock %}
+</div> <!-- /container -->
+
+
+<!-- FOOTER -->
+<div class="container" style="margin-top: 1in;">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="pull-left" style="padding-right: 1%;">
+                <img src="/static/logo.png" alt="NBMN logo"
+                     class="img-responsive img-circle"
+                     width="32" height="32" style="vertical-align:center;"
+                >
+            </div>
+            <div class="text-success" style="font-size: 150%;">
+                KEEP ON EATIN
+                {% if usr.admin %} BITCHES {% endif %}
+            </div>
+            <div class="text-warning" style="font-size: 70%;">
+                Gourmands and Movies -- brought to you by the Hub of Western Civilization
+                &nbsp;&nbsp;&nbsp;
+                <a href="{{url_for('lawyer.tos')}}">Terms of Service</a>
+                &sect;
+                <a href="{{url_for('lawyer.about')}}">About</a>
+                &sect;
+                <a href="{{url_for('lawyer.faq')}}">FAQ</a>
+            </div>
+            <div class="text-success" style="font-size: 65%;">
+                Copyright (c) {{g.year}} - but we'll share if you ask
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- JAVASCRIPT RESOURCES -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/responsive/1.0.3/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+
+
+<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="/static/nutbush.js"></script>
+
+<script type="text/javascript">
+    $('.dropdown-toggle').dropdown();
+</script>
+
+{% block extra_js %}
+{% endblock %}
+
+</body>
+</html>

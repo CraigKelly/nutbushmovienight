@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Nutbush Movie Night Exploration {% endblock %}
+{% block display_title %} Get to Queryin {% endblock %}
+{% block display_title_sub %} Question Everything {% endblock %}
+{% block main_content %}
+
+<div class="row">
+<div class="col-md-12">
+    Need to setup, need to hit gimme, need an interface, need rollovers for nights and movie, etc
+    <div id="progressInfo" class="well"></div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var data_endpoint = "{{url_for('data.data_dump')}}";
+    var all_data = {
+        'nights': [],
+        'attendees': [],
+        'movies': [],
+    };
+
+    $(function() {
+        $("#progressInfo").text("Loading data..."); //TODO: nicer loading msg with icon
+        data.all_data(data_endpoint,
+            // success
+            function(data, textStatus) {
+                //TODO: set up querying and show some stats
+                all_data = data;
+                $("#progressInfo").text("Total Nights:" + _(all_data).prop("nights").prop("length").value());
+            },
+            // error
+            function(request, textStatus, errorThrown) {
+                //TODO: better error reporting, shut down querying, and have a retry button
+                $("#progressInfo").text(textStatus + ": " + errorThrown);
+            }
+        );
+    });
+</script>
+{% endblock %}

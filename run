@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#Note that we assume that we are running from the directory that where
+#everything is located.  If you want to move this script, set the $SCRIPT_DIR
+#variable some other way
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd $SCRIPT_DIR
+source $SCRIPT_DIR/venv/bin/activate
+
+AUTO_CFG="$SCRIPT_DIR/current.config"
+
+if [ "" == "$NBMN_CONFIG" ]; then
+    if [ -f "$AUTO_CFG" ]; then
+        echo "NBNM_CONFIG not defined, but found auto config file name"
+        echo "Setting to $AUTO_CFG"
+        export NBMN_CONFIG="$AUTO_CFG"
+    else
+        echo "NOTE! NBMN_CONFIG is not defined and NO auto .config"
+        echo " ... ($AUTO_CFG) was NOT found ...."
+        echo "Only the default values in $SCRIPT_DIR/default.config"
+        echo "will be used by nbnm"
+    fi
+fi
+
+python $SCRIPT_DIR/main.py

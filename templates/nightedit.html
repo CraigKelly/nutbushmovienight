@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Nutbush Movie Night{% endblock %}
+
+{% block display_title %}Nutbush Movie Night{% endblock %}
+{% block display_title_sub %} Changing Data! {% endblock %}
+
+{% block main_content %}
+
+<div class="row">
+    <form method="post" action="{{url_for('main.night_display', datestr=movienight.datestr, mode=mode)}}" class="form">
+
+    <div class="col-md-6">
+        <h2>Movie Night</h2>
+
+        <div class="form-group">
+        <label for="moviedate" class="control-label">Date (YYYYMMDD)</label>
+        <input type="datetime" class="form-control" name="moviedate" id="moviedate" placeholder="Movie Night Date" value="{{ movienight.datestr }}">
+        </div>
+
+        <div class="form-group">
+        <label for="movieimdbid" class="control-label">IMDB ID</label>
+        <input type="text" class="form-control" name="movieimdbid" id="movieimdbid" placeholder="IMDB ID" value="{{ movienight.imdbid }}">
+        </div>
+
+        <div class="form-group">
+        <label for="moviename" class="control-label">Movie Name</label>
+        <input type="text" class="form-control" name="moviename" id="moviename" placeholder="Movie Name" value="{{ movienight.moviename }}">
+        </div>
+
+        <div class="form-group">
+        <label for="moviemeal" class="control-label">Movie Meal</label>
+        <input type="text" class="form-control" id="moviemeal" name="moviemeal" placeholder="What was et" value="{{ movienight.dinner }}">
+        </div>
+
+        <div class="form-group">
+        <label for="moviecomments" class="control-label">Comments</label>
+        <textarea class="form-control" name="moviecomments" id="moviecomments" class="field span6" rows="8" cols="20"
+            placeholder="You may include HTML and embedded media">{{ movienight.comments }}</textarea>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Attending</h3>
+        <div class="form-group dual-col">
+            {% for att in attendees %}
+                <div class="checkbox">
+                    <label>
+                    <input type="checkbox" name="oldhat_{{att.name}}" id="oldhat_{{att.name}}" value="{{att.name}}" {{att.checked}}>
+                    {{ att.name }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="newattendees" class="control-label">Fresh Blood</label>
+            <input type="text" class="form-control" name="newattendees" id="newattendees" value="" placeholder="Enter multiple names separated by commas">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" id="cmdsave" name="cmdsave" class="btn btn-primary">Save</button>
+            {% if mode == "edit" %}
+                &nbsp;&nbsp;
+                <button type="submit" id="cmddel" name="cmddel" class="btn btn-danger">DELETE</button>
+                <input type="hidden" name="dodel" value="" />
+            {% endif %}
+            &nbsp;&nbsp;
+            <button id="cmdcancel" name="cmdcancel" class="btn btn-default">Cancel</button>
+        </div>
+    </div>
+
+</form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript" src="/static/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/static/ckeditor/adapters/jquery.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $("#moviedate").datepicker({
+            showButtonPanel: true,
+            dateFormat: "yymmdd"
+        });
+
+        $("#cmdcancel").click(function(event){
+            event.preventDefault();
+            location.href = "{{url_for('main.night_display', datestr=movienight.datestr)}}";
+        });
+
+        $("#cmddel").click(function(event) {
+            if (confirm("Continue with this PERMANENT delete?")) {
+                $('input[name=dodel]').val('Delete Me');
+                //And just let the POST commence
+            }
+            else {
+                event.preventDefault();
+                $('input[name=dodel]').val('');
+            }
+        });
+
+        $("#moviecomments").ckeditor();
+    });
+</script>
+{% endblock %}

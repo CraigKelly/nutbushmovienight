@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $SCRIPT_DIR
+
+if [ ! -f $SCRIPT_DIR/venv/bin/activate ]; then
+    echo "No virtualenv found - you should run ./setup and try again"
+    exit 1
+fi
+
+source $SCRIPT_DIR/venv/bin/activate
+python -m nbmn.tools $*
