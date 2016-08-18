@@ -80,7 +80,7 @@ def get_movie_data(imdbid, use_rt=True):
         imdb_json = rt_get(imdbid)
         rt_err = imdb_json.get("error", "").strip()
         if rt_err:
-            app_logger().info("Failed on RT query for %s - will try OMDB. Error was", imdbid, rt_err)
+            app_logger().info("Failed on RT query for %s - will try OMDB. Error was %s", imdbid, rt_err)
             rt_success = False
         else:
             app_logger().info("RT query succeed for %s", imdbid)
