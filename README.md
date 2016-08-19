@@ -37,7 +37,7 @@ to the path of the file.
 
 ## Tools
 
-The `tools` script can run the application, run unit tests, and has a some other
+The `tools` script can run the application, run unit tests, and has some other
 tricks. Try `./tools help` for a list.
 
 ## Google Props
