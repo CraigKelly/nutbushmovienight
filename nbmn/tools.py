@@ -206,14 +206,6 @@ def export(opts):
     out_filename = opts[0]
     print("Using output file: %s" % out_filename)
 
-    print("Configuring logging to use postgresql-import.log")
-    import logging
-    logging.basicConfig(level=logging.DEBUG, filename='postgresql-import.log')
-    stdout_handler = logging.StreamHandler()
-    stdout_handler.setLevel(logging.WARN)
-    log = logging.getLogger()
-    log.addHandler(stdout_handler)
-
     alternate_copy(
         Database("sqlite", filename=out_filename),
         "sqlite-export.log"
