@@ -47,7 +47,3 @@ you might need to create). The redirect URL should be `/oauthcallback` (the
 default). Be sure to add localhost so that you can test on your local box
 (e.g. http://localhost:8081/oauthcallback)
 
-## Rotten Tomatoes
-
-NBMN uses Rotten Tomatoes for movie information (but can fall back to
-omdbapi.com if required). You'll need to get your own API key.
