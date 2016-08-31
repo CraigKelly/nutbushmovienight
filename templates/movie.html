@@ -20,7 +20,7 @@
 
     {% if movie %}
         {% if movie.imdbid %}
-            <div class="info" id="mater_query_progress" name="mater_query_progress"></div>
+            <div class="info" id="movie_query_progress" name="movie_query_progress"></div>
 
             <table><tr><td>
                 <table class="moviegrid" border="0">
@@ -67,7 +67,7 @@ $('#allmovies').dataTable({
 
 {% if movie and movie.imdbid %}
 var imdbid = "{{movie.imdbid}}";
-mater.movie_by_imdb(imdbid, function(all_data, textStatus) {
+data.movie_by_imdb(imdbid, function(all_data, textStatus) {
     if (all_data.error) {
         $("#errorFromJSText").html(all_data.error);
         $("#errorFromJS").show();

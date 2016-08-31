@@ -81,16 +81,15 @@ class Movie(object):
 
     @Index
     def index_imdbid(self):
-        """index by IMDB key."""
+        """Index by IMDB key."""
         return norm_imdbid(self.imdbid)
 
     @classmethod
-    def find_by_imdb(cls, imdbid, force=False, use_rt=True):
-        """Find by IMDB id in DB - our search RT and OMDB if not found.
+    def find_by_imdb(cls, imdbid, force=False):
+        """Find by IMDB id in DB - search remote sources if not found.
 
         If force is set to True, remote sources will be queries regardless of
-        past data. If use_rt is set to False, RT will be skipped (and so OMDB
-        will be our source).
+        past data.
         """
         imdbid = norm_imdbid(imdbid)
         if not imdbid:
@@ -116,7 +115,7 @@ class Movie(object):
             dbobj = dbobj[0]
 
         if force or not dbobj.extdata or not dbobj.extdata.get('imdb', None):
-            dbobj.extdata = get_movie_data(imdbid, use_rt=use_rt)
+            dbobj.extdata = get_movie_data(imdbid)
             dbobj.name = dbobj.extdata.get('imdb', {}).get('title', '').strip()
             dbobj.save()
 

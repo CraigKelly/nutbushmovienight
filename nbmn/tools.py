@@ -20,6 +20,7 @@ from gludb.config import class_database, Database
 from gludb.simple import DBObject
 
 from .model import Movie, Night, Attendee
+from .remote import norm_imdbid
 
 COMMANDS = dict()
 
@@ -87,6 +88,31 @@ def testrun(opts):
     # env['NBMN_CONFIG'] = os.path.abspath('./test/test.config')
     with env_var('NBMN_CONFIG', os.path.abspath('./test/test.config')):
         return subprocess.run(["./run"] + opts).returncode
+
+
+@command
+def fixmovies(opts):
+    """Re-query remote sources for every movie in the DB."""
+    print("Configuring database backend")
+    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
+        import main
+        main.database_config()
+        movies = set()
+
+        print("Scanning Nights...")
+        for night in Night.find_all():
+            movies.add(norm_imdbid(night.imdb))
+
+        print("Scanning Movies...")
+        for movie in Movie.find_all():
+            movies.add(norm_imdbid(movie.imdb))
+
+        print("...Found %d unique movie ID's" % len(movies))
+
+        for imdbid in movies:
+            pass  # TODO: actual work
+
+    print("Finished.")
 
 
 @command

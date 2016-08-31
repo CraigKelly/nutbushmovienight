@@ -2,7 +2,7 @@
 
 import unittest
 
-from nbmn.remote import _parse_url, norm_imdbid
+from nbmn.remote import norm_imdbid
 
 
 class RemoteHelperTesting(unittest.TestCase):
@@ -11,27 +11,6 @@ class RemoteHelperTesting(unittest.TestCase):
 
     def tearDown(self):
         pass
-
-    def assertUrl(self, url, exp_bare, exp_qs):
-        bare, qs = _parse_url(url)
-        self.assertEqual(exp_bare, bare)
-        self.assertEqual(exp_qs, qs)
-
-    def testParseUrl(self):
-        self.assertUrl(None, None, None)
-        self.assertUrl("", None, None)
-
-        self.assertUrl("http://a.b.com", "http://a.b.com", dict())
-        self.assertUrl("http://a.b.com/d1/d2/a.html", "http://a.b.com/d1/d2/a.html", dict())
-
-        self.assertUrl("http://a.b.com?a=b&x=y",
-            "http://a.b.com",
-            {'a': 'b', 'x': 'y'}
-        )
-        self.assertUrl("http://a.b.com/d1/d2/a.html?a=b&x=y",
-            "http://a.b.com/d1/d2/a.html",
-            {'a': 'b', 'x': 'y'}
-        )
 
     def testNormImdb(self):
         self.assertEqual('', norm_imdbid(0))

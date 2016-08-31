@@ -73,26 +73,25 @@ def movie_display(moviekey=None):
         return {'movies': movies, 'movie_name': 'ALL'}
 
 
-@main.route('/moviemater/<materkey>')
+@main.route('/moviedata/<imdbkey>')
 @logged_errors
-def movie_mater(materkey):
-    """Movie lookup via mater API."""
-    movie = Movie.find_by_imdb(materkey)
+def movie_data(imdbkey):
+    """Movie lookup via remote API."""
+    movie = Movie.find_by_imdb(imdbkey)
     if not movie:
         abort(404)
     return jsonify(**movie.extdata)
 
 
-@main.route('/badmovie/<materkey>')
+@main.route('/badmovie/<imdbkey>')
 @logged_errors
-def bad_movie(materkey):
+def bad_movie(imdbkey):
     """Allow a refresh from the OMDB API if a movie looks incorrect."""
-    use_rt = bool(int(request.args.get('use_rt', 0)))
-    app_logger().info("Bad Movie GET - forcing %s with use_rt=%s", materkey, use_rt)
-    movie = Movie.find_by_imdb(materkey, force=True, use_rt=use_rt)
+    app_logger().info("Bad Movie GET - forcing %s", imdbkey)
+    movie = Movie.find_by_imdb(imdbkey, force=True)
     if not movie:
-        app_logger().warn("No movie found for %s", materkey)
-    return redirect(url_for('main.movie_display', moviekey=materkey))
+        app_logger().warn("No movie found for %s", imdbkey)
+    return redirect(url_for('main.movie_display', moviekey=imdbkey))
 
 
 @main.route('/person')

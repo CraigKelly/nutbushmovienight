@@ -75,7 +75,7 @@ _.mixin({
 
     namespace.progress_text = function(txt) {
         try {
-            $("#mater_query_progress").html(txt);
+            $("#movie_query_progress").html(txt);
         }
         catch(err) {
             //Nothing currently
@@ -112,10 +112,10 @@ _.mixin({
 
     namespace.movie_by_imdb = function(imdbid, success_func) {
         namespace.core_request(
-            "/moviemater/" + imdbid,
+            "/moviedata/" + imdbid,
             success_func);
     };
-})(module("mater"));
+})(module("data"));
 
 
 //////////////////////////////////////////////////////////////////////////

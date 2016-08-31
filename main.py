@@ -37,9 +37,6 @@ app.config.from_pyfile('default.config')
 app.config.from_envvar('NBMN_CONFIG', silent=False)
 app.secret_key = app.config.get('FLASK_SECRET', None)
 
-# Update any downstream config variables
-nbmn.remote.MATER_API_KEY = app.config.get('MATER_API_KEY', '')
-
 # Handle debug flag from config file - and let them use anything truthy to
 # our DEBUG flag
 app.debug = True if app.config.get('DEBUG', None) else False
