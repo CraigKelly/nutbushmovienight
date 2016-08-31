@@ -9,7 +9,7 @@ the project (but note that we import nbmn via relative imports since we are
 part of the package).
 """
 
-# pylama:ignore=E501
+# pylama:ignore=E501,D204
 
 import sys
 import os
@@ -50,6 +50,24 @@ def usage(msg=""):
     print("tools <cmd> [options related to cmd]")
     print("Run 'tools help' for details")
     return 1
+
+
+@DBObject(table_name='Nights')
+class NightOutput(Night):
+    """Used for writing to alternate data location."""
+    pass
+
+
+@DBObject(table_name='Movies')
+class MovieOutput(Movie):
+    """Used for writing to alternate data location."""
+    pass
+
+
+@DBObject(table_name='Attendees')
+class AttendeeOutput(Attendee):
+    """Used for writing to alternate data location."""
+    pass
 
 
 @command
@@ -141,6 +159,43 @@ def fixpeeps(opts):
     print("Finished.")
 
 
+def alternate_copy(glu_database, log_file):
+    """Copy all data to the alternate gludb database location."""
+    print("Configuring logging to use %s" % log_file)
+    import logging
+    logging.basicConfig(level=logging.DEBUG, filename=log_file)
+    stdout_handler = logging.StreamHandler()
+    stdout_handler.setLevel(logging.WARN)
+    log = logging.getLogger()
+    log.addHandler(stdout_handler)
+
+    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
+        log.warn("Starting main database config")
+        import main
+        main.database_config()
+
+        class_database(AttendeeOutput, glu_database)
+        class_database(MovieOutput, glu_database)
+        class_database(NightOutput, glu_database)
+        log.warn("Creating output tables...")
+        AttendeeOutput.ensure_table()
+        NightOutput.ensure_table()
+        MovieOutput.ensure_table()
+
+        def xfer(name, in_table, out_table):
+            log.warn("Transferring %s..." % name)
+            count = 0
+            for record in in_table.find_all():
+                out_table.from_data(record.to_data()).save()
+                count += 1
+            log.warn("...Saved %d" % count)
+
+        xfer("attendees", Attendee, AttendeeOutput)
+        xfer("nights", Night, NightOutput)
+        xfer("movies", Movie, MovieOutput)
+        log.warn("Finished.")
+
+
 @command
 def postgre(opts):
     """Read movies and nights using current.config and write to postgresql."""
@@ -151,58 +206,36 @@ def postgre(opts):
     conn_string = ' '.join(opts)
     print("Using conn str: %s" % conn_string)
 
-    @DBObject(table_name='Nights')
-    class NightOutput(Night):
-        pass
-
-    @DBObject(table_name='Movies')
-    class MovieOutput(Movie):
-        pass
-
-    print("Configuring logging to use postgresql-import.log")
-    import logging
-    logging.basicConfig(level=logging.DEBUG, filename='postgresql-import.log')
-    stdout_handler = logging.StreamHandler()
-    stdout_handler.setLevel(logging.WARN)
-    log = logging.getLogger()
-    log.addHandler(stdout_handler)
-
-    log.warn("Dropping postgresql tables...")
+    print("Dropping postgresql tables...")
     import psycopg2
     with psycopg2.connect(conn_string) as conn:
         with conn.cursor() as cur:
-            log.warn("Dropping %s", NightOutput.get_table_name())
+            print("Dropping %s", NightOutput.get_table_name())
             cur.execute("drop table if exists " + NightOutput.get_table_name())
-            log.warn("Dropping %s", MovieOutput.get_table_name())
+            print("Dropping %s", MovieOutput.get_table_name())
             cur.execute("drop table if exists " + MovieOutput.get_table_name())
+            print("Dropping %s", AttendeeOutput.get_table_name())
+            cur.execute("drop table if exists " + AttendeeOutput.get_table_name())
 
-    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
-        log.warn("Starting main database config")
-        import main
-        main.database_config()
+    alternate_copy(
+        Database("postgresql", conn_string=conn_string),
+        "postgresql-import.log"
+    )
 
-        log.warn("Adding postgresql database config")
-        postgresql = Database("postgresql", conn_string=conn_string)
-        class_database(NightOutput, postgresql)
-        class_database(MovieOutput, postgresql)
-        log.warn("Creating postgresql tables...")
-        NightOutput.ensure_table()
-        MovieOutput.ensure_table()
 
-        log.warn("Transferring nights...")
-        count = 0
-        for night in Night.find_all():
-            NightOutput.from_data(night.to_data()).save()
-            count += 1
-        log.warn("...Saved %d" % count)
+@command
+def export(opts):
+    """Read all major data into specified sqlite database file."""
+    if len(opts) != 1:
+        print("Command line should be the target file name")
+        return
+    out_filename = opts[0]
+    print("Using output file: %s" % out_filename)
 
-        log.warn("Transferring movies...")
-        count = 0
-        for movie in Movie.find_all():
-            MovieOutput.from_data(movie.to_data()).save()
-            count += 1
-        log.warn("...Saved %d" % count)
-    log.warn("Finished.")
+    alternate_copy(
+        Database("sqlite", filename=out_filename),
+        "sqlite-export.log"
+    )
 
 
 def main():

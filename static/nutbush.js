@@ -122,7 +122,6 @@ _.mixin({
 // Data querying helper module
 
 (function(namespace){
-    // TODO: switch to jQuery futures by just returning the query
     namespace.all_data = function(endpoint, success_func, error_func) {
         $.ajax({
             url: endpoint,
