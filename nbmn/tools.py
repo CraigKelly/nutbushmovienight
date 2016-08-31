@@ -115,20 +115,22 @@ def fixmovies(opts):
     with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
         import main
         main.database_config()
-        movies = set()
+        movies = set([""])  # Will remove empty string when done
 
         print("Scanning Nights...")
         for night in Night.find_all():
-            movies.add(norm_imdbid(night.imdb))
+            movies.add(norm_imdbid(night.imdbid))
 
         print("Scanning Movies...")
         for movie in Movie.find_all():
-            movies.add(norm_imdbid(movie.imdb))
+            movies.add(norm_imdbid(movie.imdbid))
 
+        movies.remove("")  # as promised
         print("...Found %d unique movie ID's" % len(movies))
 
         for imdbid in movies:
-            pass  # TODO: actual work
+            movie = Movie.find_by_imdb(imdbid, force=True)
+            print("Searched %s: Found %s => %s" % (imdbid, movie.imdbid, movie.name))
 
     print("Finished.")
 

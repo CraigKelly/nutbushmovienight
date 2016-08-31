@@ -40,11 +40,7 @@ def main_page():
         thumb = None
         movie = Movie.find_by_imdb(night.imdbid)
         if movie and movie.extdata:
-            imglist = movie.extdata.get('imdb', {}).get('posters', {})
-            for tag in ["thumbnail", "profile", "detailed", "original"]:
-                thumb = imglist.get(tag, None)
-                if thumb and thumb != "N/A":
-                    break
+            thumb = movie.extdata.get('omdb', {}).get('Poster', '')
         night.thumb = thumb or "/static/default_movie_thumb.png"
 
     return {

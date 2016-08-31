@@ -114,9 +114,11 @@ class Movie(object):
 
             dbobj = dbobj[0]
 
-        if force or not dbobj.extdata or not dbobj.extdata.get('imdb', None):
+        if force or not dbobj.extdata or not dbobj.extdata.get('omdb', None):
             dbobj.extdata = get_movie_data(imdbid)
-            dbobj.name = dbobj.extdata.get('imdb', {}).get('title', '').strip()
+            ext_name = dbobj.extdata.get('omdb', {}).get('Title', '').strip()
+            if ext_name:
+                dbobj.name = ext_name
             dbobj.save()
 
         return dbobj

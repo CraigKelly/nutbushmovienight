@@ -15,30 +15,27 @@
         </div>
     </div></div>
 
-    <div class="row">
-    <div class="col-md-12">
-
     {% if movie %}
         {% if movie.imdbid %}
-            <div class="info" id="movie_query_progress" name="movie_query_progress"></div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="info" id="movie_query_progress" name="movie_query_progress"></div>
+            </div>
+        </div>
 
-            <table><tr><td>
-                <table class="moviegrid" border="0">
-                    <tr><th>Genre</th><td id="tom_genre" name="tom_genre">&nbsp;</td></tr>
-                    <tr><th>Release</th><td id="tom_release" name="tom_release">&nbsp;</td></tr>
-                    <tr><th>Runtime</th><td id="tom_runtime" name="tom_runtime">&nbsp;</td></tr>
-                    <tr><th>Director</th><td id="tom_director" name="tom_director">&nbsp;</td></tr>
-                    <tr><th id="tom_castlabel" name="tom_castlabel">Cast</th><td id="tom_cast" name="tom_cast">&nbsp;</td></tr>
-                    <tr><th>Critics</th><td id="tom_critics" name="tom_critics">&nbsp;</td></tr>
-                    <tr><th>Audience</th><td id="tom_audience" name="tom_audience">&nbsp;</td></tr>
-                    <tr><th>Synopsis</th><td id="tom_synopsis" name="tom_synopsis">&nbsp;</td></tr>
-                </table>
-            </td><td style="vertical-align:top;">
-                <img id="tom_movieimg" src="" name="tom_movieimg" alt="{{movie.name}}" align="top"/>
-            </td></tr></table>
+        <div class="row">
+            <div class="col-md-8" id="movie-details-container">
+            </div>
+            <div class="col-md-4">
+                <img id="det-movieimg" src="" alt="{{movie.name}}" class="img-responsive img-thumbnail"/>
+            </div>
+        </div>
         {% endif %}
 
     {% else %}
+        <div class="row">
+        <div class="col-md-12">
+
         <table class="datatable SortableTable" id="allmovies" name="allmovies">
         <thead>
             <tr><th>Movie</th></tr>
@@ -52,10 +49,10 @@
         </tbody>
         </table>
 
-    {% endif %}
+        </div>
+        </div>
 
-    </div>
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -75,78 +72,51 @@ data.movie_by_imdb(imdbid, function(all_data, textStatus) {
         return;
     }
 
-    var data = all_data.imdb;
-    var detail = all_data.rottom;
+    <!-- TODO: perhaps show imdb and rotten tomatoes data? -->
 
-    var datastr = "";
+    console.log(all_data);
+    var movie_data = all_data.omdb;
 
-    var takeFirst = function(obj, fldname_list) {
-        var ret = "";
-        for(var i in fldname_list) {
-            ret = _.prop(obj, fldname_list[i], "");
-            if (ret && ret != "N/A")
-                return ret;
+    function addOne(title, disp) {
+        if (disp === null) {
+            disp = _.prop(movie_data, title);
         }
-        return ret;
-    };
+        if (_.isArray(disp)) {
+            disp = _.join(disp, ',');
+        }
 
-    imgs = _.prop(data, "posters");
-    $("#tom_movieimg").attr("src", takeFirst(imgs, ["detailed", "original", "profile", "thumbnail"]));
-
-    $("#tom_genre").html("" + _.prop(data, "genres", ""));
-    $("#tom_synopsis").html(_.prop(data, "synopsis", ""));
-    $("#tom_runtime").html("Rated " + _.prop(data, "mpaa_rating", "?") + " at " + _.prop(data, "runtime", "?") + " minutes");
-
-    var rel = _.prop(data, "year") + " " + _.prop(data, "studio", "");
-    var relds = _.prop(data, "release_dates", "")
-    for (var i in relds) {
-        rel += "<br/> &nbsp; &nbsp; * " + _.toTitleCase(i) + " on " + relds[i];
-    }
-    $("#tom_release").html(rel);
-
-    var ratings = _.prop(data, "ratings", "");
-
-    $("#tom_critics").html(
-        _.prop(ratings, "critics_score", "??") + ": " +
-        _.prop(ratings, "critics_rating", "??") + "<br/>" +
-        _.prop(data, "critics_consensus", "")
-    );
-
-    $("#tom_audience").html(
-        _.prop(ratings, "audience_score", "??") + ": " +
-        _.prop(ratings, "audience_rating", "??")
-    );
-
-    var cast = _.prop(detail, "cast", "");
-    if (!cast || cast == "") {
-        cast = _.prop(data, "abridged_cast", "");
-        $("#tom_castlabel").html("Cast (Abridged)");
+        var newEle = $('<div class="row"></div>');
+        newEle.append(
+            $('<div class="col-md-1 data-name"></div>').text(title)
+        );
+        newEle.append(
+            $('<div class="col-md-offset-1 col-md-10 data-value"></div>').text(disp)
+        );
+        $("#movie-details-container").append(newEle);
+        return newEle;
     }
 
-    var caststr = "";
-    for (var i in cast) {
-        var one = cast[i];
-        var act_name = _.prop(one, "name", "");
-        var char_name = _.prop(one, "characters", "");
-        if (!char_name || char_name == "")
-            char_name = false;
-
-        caststr += act_name;
-        if (char_name)
-            caststr += " (Playing " + char_name + ")";
-        caststr += "<br/>";
+    img = _.prop(movie_data, "Poster");
+    if (!!img) {
+        $("#det-movieimg").attr("src", img);
     }
 
-    $("#tom_cast").html(caststr);
-
-    var dir = _.prop(data, "abridged_directors", "")
-    var dirstr = "";
-    for (var i in dir) {
-        var one = dir[i];
-        if (i > 0) dirstr += ", ";
-        dirstr += _.prop(one, "name", "");
-    }
-    $("#tom_director").html(dirstr);
+    addOne("Director", null);
+    addOne('Writer', null);
+    addOne("Actors", null);
+    addOne('Production', null);
+    addOne('Country', null);
+    addOne('Language', null);
+    addOne("Runtime", null);
+    addOne("Genre", null);
+    addOne("Year", null);
+    addOne('Released', null);
+    addOne('DVD', null);
+    addOne('Awards', null);
+    addOne('Rated', null);
+    addOne('Metascore', null);
+    addOne('BoxOffice', null);
+    addOne("Plot", null);
 });
 {% endif %}
 </script>

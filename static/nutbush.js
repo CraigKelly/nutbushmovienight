@@ -66,7 +66,7 @@ _.mixin({
 
 
 //////////////////////////////////////////////////////////////////////////
-// Rotten Tomato helper module
+// Remote Movie Data helper module
 
 (function(namespace){
     namespace.err_display = function(txt) {
