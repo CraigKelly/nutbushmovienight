@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify
 
 # Create app and handle configuration
 app = Flask(__name__)
-app.config.from_pyfile('default.config')
+app.config.from_pyfile('../default.config')
 app.config.from_envvar('NBMN_CONFIG', silent=False)
 app.secret_key = app.config.get('FLASK_SECRET', None)
 
