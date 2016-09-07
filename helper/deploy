@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $SCRIPT_DIR/..
+
+echo "Redeploying in $(pwd)"
+echo "Started at: $(date)"
+echo "Stopping: $1"
+supervisorctl stop $1
+echo "Getting latest code"
+git pull --all
+echo "Starting: $1"
+supervisorctl start $1

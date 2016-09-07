@@ -1,0 +1,21 @@
+#!/bin/bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd $SCRIPT_DIR
+source $SCRIPT_DIR/../venv/bin/activate
+
+AUTO_CFG="$SCRIPT_DIR/../current.config"
+
+if [ "" == "$NBMN_CONFIG" ]; then
+    if [ -f "$AUTO_CFG" ]; then
+        echo "NBNM_CONFIG not defined, but found auto config file name"
+        echo "Setting to $AUTO_CFG"
+        export NBMN_CONFIG="$AUTO_CFG"
+    else
+        echo "Setup is not complete and correct."
+        exit 1
+    fi
+fi
+
+python $SCRIPT_DIR/server.py
