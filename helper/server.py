@@ -2,6 +2,8 @@
 
 """Nutbush Movie Night deployment hook."""
 
+# pylama:ignore=E501,D103
+
 import os
 import os.path as pth
 import subprocess
@@ -35,7 +37,29 @@ def script_path(relpath):
     return pth.join(base, relpath)
 
 
-@app.route('/nbmnhook', methods=['POST'])
+def run(*args):
+    try:
+        output = subprocess.check_output(args, stderr=subprocess.STDOUT)
+        returncode = 0
+        results = 'ok'
+    except subprocess.CalledProcessError as e:
+        output = e.output
+        returncode = e.returncode
+        results = 'error'
+    return output, returncode, results
+
+
+@app.route('/nbmnhook', methods=['GET'], strict_slashes=False)
+def github_info():
+    output, returncode, results = run('git', 'log', '--max-count=1')
+    return jsonify({
+        'results': results,
+        'output': output,
+        'returncode': returncode,
+    })
+
+
+@app.route('/nbmnhook', methods=['POST'], strict_slashes=False)
 def github_push_hook():
     """Github is telling us what is up."""
     hook_type = request.headers.get('X-GitHub-Event', 'NO-HEADER-FOUND!!!')
@@ -64,18 +88,7 @@ def github_push_hook():
             'reason': 'No value found for  DEPLOY_SUPER'
         })
 
-    try:
-        output = subprocess.check_output(
-            script_path('./deploy'), super_name,
-            stderr=subprocess.STDOUT
-        )
-        results = 'ok'
-        returncode = 0
-    except subprocess.CalledProcessError as e:
-        results = 'error'
-        output = e.output
-        returncode = e.returncode
-
+    output, returncode, results = run(script_path('./deploy'), super_name)
     return jsonify({
         'results': results,
         'output': output,
