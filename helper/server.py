@@ -46,16 +46,20 @@ def run(*args):
         output = e.output
         returncode = e.returncode
         results = 'error'
+    try:
+        output = output.decode('utf-8')
+    except:
+        output = "Could not decode output - forcing: " + str(output)
     return output, returncode, results
 
 
 @app.route('/nbmnhook', methods=['GET'], strict_slashes=False)
 def github_info():
-    output, returncode, results = run('git', 'log', '--max-count=1')
+    output, rc, results = run('git', 'log', '--max-count=1', '--color=never')
     return jsonify({
         'results': results,
         'output': output,
-        'returncode': returncode,
+        'returncode': rc,
     })
 
 
