@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
-"""Nutbush Movie Night web app.
+"""
+Nutbush Movie Night web app.
 
 This is the main entry point for the web app. The actual functionality is in
 the nbmn package. See utest for unit testing and test for functional test
 setup.
 """
 
-# pylama:ignore=E501
+# pylama:ignore=E501,D212
 
 # TODO: allow image uploads and usage with our ckeditor
 
@@ -29,8 +30,6 @@ from nbmn.main_app import main
 from nbmn.data import data
 from nbmn.lawyer import lawyer
 
-import nbmn.remote
-
 # Create app and handle configuration
 app = Flask(__name__)
 app.config.from_pyfile('default.config')
@@ -42,10 +41,8 @@ app.secret_key = app.config.get('FLASK_SECRET', None)
 app.debug = True if app.config.get('DEBUG', None) else False
 
 # Set up logging
-if app.debug:
-    logging.basicConfig(level=logging.DEBUG)
-else:
-    logging.basicConfig(level=logging.INFO)
+LOG_LEVEL = logging.DEBUG if app.debug else logging.INFO
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s %(message)s')
 app_logger().info('Application logging begin: debug==%s', app.debug)
 
 # They can specify that certain config variables are copied in to
@@ -133,3 +130,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    logging.shutdown()
