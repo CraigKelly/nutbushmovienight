@@ -8,7 +8,7 @@ to migrate the data.
 
 Built with flask and should run behind a proxy like caddy or nginx.
 
-## First things first
+## First Things first
 
 Make sure to `./setup` to bootstrap the virtualenv properly.
 
@@ -18,9 +18,9 @@ To demo on your local with no authentication, run `./run`
 
 See configuration below, but you can get started with:
 
- * Copy `test/test.config` to `./current.config`
- * Change banner, debug, google props, amd rotten tomatoes API key
- * `./run`
+* Copy `test/test.config` to `./current.config`
+* Change banner, debug, and Google props
+* `./run`
 
 You can also use the `tools` script instead: `./tools run`
 
@@ -46,4 +46,3 @@ Go to the Google developer's console and set credentials for you app (which
 you might need to create). The redirect URL should be `/oauthcallback` (the
 default). Be sure to add localhost so that you can test on your local box
 (e.g. http://localhost:8081/oauthcallback)
-
