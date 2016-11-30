@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-"""Nutbush Movie Night tools script.
+"""
+Nutbush Movie Night tools script.
 
 Run this script via the bash script ./tool in the root of this project
 
@@ -9,7 +10,7 @@ the project (but note that we import nbmn via relative imports since we are
 part of the package).
 """
 
-# pylama:ignore=E501,D204
+# pylama:ignore=E501,D204,D212
 
 import sys
 import os
@@ -252,6 +253,7 @@ def main():
         return usage("Unknown cmd " + cmd)
 
     return cmd_func(opts)
+
 
 if __name__ == '__main__':
     sys.exit(main() or 0)
