@@ -88,7 +88,7 @@
 
         $("#cmdcancel").click(function(event){
             event.preventDefault();
-            location.href = "{{url_for('main.night_display', datestr=movienight.datestr)}}";
+            location.href = "{{cancel_url}}";
         });
 
         $("#cmddel").click(function(event) {

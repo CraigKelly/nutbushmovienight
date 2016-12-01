@@ -253,11 +253,17 @@ def do_night_edit(night, mode):
     for att in attendees:
         att.checked = "checked" if att.name in checked else ""
 
+    if mode == "add":
+        cancel_url = url_for("main.main_page")
+    else:
+        cancel_url = url_for("main.night_display", datestr=night.datestr)
+
     return template(
         "nightedit.html",
         movienight=night,
         mode=mode,
         attendees=attendees,
+        cancel_url=cancel_url
     )
 
 
