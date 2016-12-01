@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Nutbush Movie Night{% endblock %}
+{% block display_title %} Movie Override{% endblock %}
+{% block display_title_sub %} Do It Live! {% endblock %}
+
+{% block main_content %}
+
+
+<div class="row">
+    <form id="override-form" method="post" action="{{url_for('main.movie_override_save', imdbid=over.imdbID)}}" class="form">
+
+    <div class="col-md-6 required-fields">
+        <h2>Required Fields</h2>
+
+        <div class="form-group">
+        <label for="imdbID" class="control-label">IMDB ID</label>
+        <span class="form-control" id="imdbID" name="imdbID">{{ over.imdbID }}</span>
+        </div>
+
+        <div class="form-group">
+        <label for="Title" class="control-label">Title</label>
+        <input type="text" class="form-control" name="Title" id="Title" placeholder="Name of the movie" value="{{ over.Title }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Poster" class="control-label">Poster</label>
+        <input type="text" class="form-control" name="Poster" id="Poster" placeholder="URL to image" value="{{ over.Poster }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Genre" class="control-label">Genre</label>
+        <input type="text" class="form-control" name="Genre" id="Genre" placeholder="Genre(s) comma separated (e.g. Comedy,Drama)" value="{{ over.Genre }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Writer" class="control-label">Writer</label>
+        <input type="text" class="form-control" name="Writer" id="Writer" placeholder="Writer(s) - can be comma separated list" value="{{ over.Writer }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Director" class="control-label">Director</label>
+        <input type="text" class="form-control" name="Director" id="Director" placeholder="Directors(s) - can be comma separated list" value="{{ over.Director }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Actors" class="control-label">Actors</label>
+        <input type="text" class="form-control" name="Actors" id="Actors" placeholder="Actors(s) - can be comma separated list" value="{{ over.Actors }}">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" id="cmdsave" name="cmdsave" class="btn btn-primary">Save</button>
+            &nbsp;&nbsp;
+            {% if previous %}
+                <button type="submit" id="cmddel" name="cmddel" class="btn btn-danger">Delete Override</button>
+                &nbsp;&nbsp;
+            {% endif %}
+            <button id="cmdcancel" name="cmdcancel" class="btn btn-default">Cancel</button>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Optional</h3>
+
+        <div class="form-group">
+        <label for="Production" class="control-label">Production</label>
+        <input type="text" class="form-control" name="Production" id="Production" placeholder="Production Company" value="{{ over.Production }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Rated" class="control-label">Rated</label>
+        <input type="text" class="form-control" name="Rated" id="Rated" placeholder="MPAA Rating" value="{{ over.Rated }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Year" class="control-label">Year</label>
+        <input type="text" class="form-control" name="Year" id="Year" placeholder="Four digit year" value="{{ over.Year }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Released" class="control-label">Release</label>
+        <input type="datetime" class="form-control provide-date-picker" name="Released" id="Released" placeholder="Theatrical Release Date" value="{{ over.Released }}">
+        </div>
+
+        <div class="form-group">
+        <label for="DVD" class="control-label">DVD</label>
+        <input type="datetime" class="form-control provide-date-picker" name="DVD" id="DVD" placeholder="DVD Release Date" value="{{ over.DVD }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Runtime" class="control-label">Runtime</label>
+        <input type="text" class="form-control" name="Runtime" id="Runtime" placeholder="Phrase like '102 mins'" value="{{ over.Runtime }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Awards" class="control-label">Awards</label>
+        <input type="text" class="form-control" name="Awards" id="Awards" placeholder="Short descriotion of number of awards" value="{{ over.Awards }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Country" class="control-label">Country</label>
+        <input type="text" class="form-control" name="Country" id="Country" placeholder="Country of origin" value="{{ over.Country }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Language" class="control-label">Language</label>
+        <input type="text" class="form-control" name="Language" id="Language" placeholder="Language(s) - can be comma separated list" value="{{ over.Language }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Metascore" class="control-label">Metascore</label>
+        <input type="text" class="form-control" name="Metascore" id="Metascore" placeholder="Metascore - numeric value" value="{{ over.Metascore }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Plot" class="control-label">Plot</label>
+        <input type="text" class="form-control" name="Plot" id="Plot" placeholder="BRIEF plot synopsis" value="{{ over.Plot }}">
+        </div>
+
+        <div class="form-group">
+        <label for="Type" class="control-label">Type</label>
+        <input type="text" class="form-control" name="Type" id="Type" placeholder="Record type - movie, episode, or series" value="{{ over.Type }}">
+        </div>
+    </div>
+
+</form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    $(function() {
+        // TODO: the date format isn't working - get it correct for `30 Nov 2016`
+        // $(".provide-date-picker").datepicker({
+        //     showButtonPanel: true,
+        //     dateFormat: "dd mmm yyyy"
+        // });
+
+        $("#cmdcancel").click(function(event){
+            event.preventDefault();
+            location.href = "{{url_for('main.movie_display', moviekey=over.imdbID)}}";
+        });
+
+        $("#cmdsave").click(function(event){
+            event.preventDefault();
+            // TODO: validation
+            $("#override-form")
+                .attr("action", "{{url_for('main.movie_override_save', imdbid=over.imdbID)}}")
+                .submit();
+        });
+
+        $("#cmddel").click(function(event) {
+            event.preventDefault();
+            if (confirm("Continue with this PERMANENT delete?")) {
+                $("#override-form")
+                    .attr("action", "{{url_for('main.movie_override_delete', imdbid=over.imdbID)}}")
+                    .submit();
+            }
+        });
+    });
+</script>
+{% endblock %}

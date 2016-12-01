@@ -1,6 +1,6 @@
 """main_app - the main functionality for Nutbush Movie Night."""
 
-# pylama:ignore=E501
+# pylama:ignore=E501,D213
 
 from os.path import isfile
 from datetime import datetime
@@ -19,8 +19,7 @@ from flask import (
 from .log import app_logger
 from .auth import NotAuthorized, require_login
 from .utils import logged_errors, template, templated, use_error_page, project_file
-from .model import User, Movie, Night, Attendee
-
+from .model import User, Movie, Night, Attendee, MovieOverride
 
 main = Blueprint('main', __name__)
 
@@ -260,3 +259,103 @@ def do_night_edit(night, mode):
         mode=mode,
         attendees=attendees,
     )
+
+
+def _default_override(imdbid):
+    FIELDS = [
+        'Actors', 'Awards', 'BoxOffice', 'Country', 'DVD', 'Director', 'Genre',
+        'Language', 'Metascore', 'Plot', 'Poster', 'Production', 'Rated',
+        'Released', 'Runtime', 'Title', 'Type', 'Website', 'Writer', 'Year',
+
+        'imdbRating', 'imdbVotes',
+
+        'tomatoConsensus', 'tomatoFresh', 'tomatoImage', 'tomatoMeter',
+        'tomatoRating', 'tomatoReviews', 'tomatoRotten', 'tomatoURL',
+        'tomatoUserMeter', 'tomatoUserRating', 'tomatoUserReviews',
+    ]
+    d = {
+        'imdbID': imdbid,
+        'Response': True
+    }
+    for f in FIELDS:
+        d[f] = ''
+    return d
+
+
+@main.route('/override/<imdbid>', methods=['GET'])
+@require_login
+@use_error_page
+def movie_override(imdbid):
+    """Show the movie override form."""
+    user = User.get_user()
+    if not user or user.utype != "admin":
+        raise NotAuthorized("You lack the requisite coolness to override movies")
+
+    from .remote import norm_imdbid
+    imdbid = norm_imdbid(imdbid)
+
+    over = MovieOverride.find_by_imdb(imdbid)
+    if over:
+        previous = True
+        over = over.extdata.get("omdb", None)
+        if not over:
+            over = _default_override(imdbid)
+    else:
+        previous = False
+        over = _default_override(imdbid)
+
+    return template(
+        "movieoverride.html",
+        over=over,
+        previous=previous,
+    )
+
+
+@main.route('/override/<imdbid>', methods=['POST'])
+@require_login
+@use_error_page
+def movie_override_save(imdbid):
+    """Save the movie override."""
+    user = User.get_user()
+    if not user or user.utype != "admin":
+        raise NotAuthorized("You lack the requisite coolness to save a movie override")
+
+    movie_over = MovieOverride.find_by_imdb(imdbid)
+    if not movie_over:
+        movie_over = MovieOverride(imdbid=imdbid)
+
+    FIELDS = [
+        'Actors', 'Awards', 'BoxOffice', 'Country', 'DVD', 'Director', 'Genre',
+        'Language', 'Metascore', 'Plot', 'Poster', 'Production', 'Rated',
+        'Released', 'Runtime', 'Title', 'Type', 'Website', 'Writer', 'Year',
+    ]
+    over = _default_override(imdbid)
+    for fld in FIELDS:
+        over[fld] = request.form.get(fld, '')
+
+    movie_over.extdata = {
+        "omdb": over,
+        "update_time": str(datetime.now())
+    }
+    movie_over.name = over.get('Title', 'UNTITLED')
+    movie_over.save()
+    Movie.find_by_imdb(movie_over.imdbid, force=True)
+
+    return redirect(url_for('main.movie_display', moviekey=movie_over.imdbid))
+
+
+@main.route('/override-delete/<imdbid>', methods=['POST'])
+@require_login
+@use_error_page
+def movie_override_delete(imdbid):
+    """Delete the movie override."""
+    user = User.get_user()
+    if not user or user.utype != "admin":
+        raise NotAuthorized("You lack the requisite coolness to delete a movie override")
+
+    movie_over = MovieOverride.find_by_imdb(imdbid)
+    if movie_over:
+        movie_over.delete()
+
+    Movie.find_by_imdb(movie_over.imdbid, force=True)
+    return redirect(url_for('main.movie_display', moviekey=movie_over.imdbid))

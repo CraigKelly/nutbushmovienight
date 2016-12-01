@@ -24,7 +24,7 @@ from flask import Flask, g
 from gludb.config import default_database, Database
 
 from nbmn.log import app_logger
-from nbmn.model import User, Movie, Night, Attendee
+from nbmn.model import User, Movie, Night, Attendee, MovieOverride
 from nbmn.auth import auth
 from nbmn.main_app import main
 from nbmn.data import data
@@ -105,6 +105,7 @@ def database_config():
     default_database(db_config)
     User.ensure_table()
     Movie.ensure_table()
+    MovieOverride.ensure_table()
     Night.ensure_table()
     Attendee.ensure_table()
     Attendee.ensure_attendees()
@@ -127,6 +128,7 @@ def main():
     app_logger().info("About to start serving on %s:%d", HOST or "[ALL IFaces]", PORT)
     from waitress import serve
     serve(app, host=HOST, port=PORT)
+
 
 if __name__ == '__main__':
     main()

@@ -54,22 +54,12 @@ use the OMDB format:
 Many of the fields might contain "N/A" (Not Applicable).
 """
 
-# pylama:ignore=E501
+# pylama:ignore=E501,D213
 
 from datetime import datetime
 import requests
 
-
-def norm_imdbid(iid):
-    """Return a normalized IMDB ID.
-
-    Our current is to break down the ID to an int and then return the
-    default format - a zero-padded 7 digit int pre-padded with 'tt'.
-    """
-    s = str(iid).strip().lower().lstrip('t').lstrip('0') if iid else ''
-    if not s:
-        return ''
-    return "tt%07d" % int(s)
+from .imdb import norm_imdbid
 
 
 def get_movie_data(imdbid):
@@ -81,15 +71,18 @@ def get_movie_data(imdbid):
     if not imdbid:
         return dict()
 
+    omdb = _omdb_get(imdbid)
+    omdb = _norm_omdb_resp(omdb)  # Always norm/filter the response
+
     return {
         "update_time": str(datetime.now()),
-        "omdb": omdb_get(imdbid)
+        "omdb": omdb
     }
 
 
 # Simple mapper from omdbapi.com to the format we expect from rot tom
 # in imdb format
-def omdb_get(omdb_id):
+def _omdb_get(omdb_id):
     """Perform OMDB GET and add any special xforms we support."""
     omdb_id = norm_imdbid(omdb_id)
     if not omdb_id:
@@ -105,7 +98,18 @@ def omdb_get(omdb_id):
     if resp.get("Response", "").lower() != "true":
         return dict()
 
-    # potentially comma-separated fields become lists
+    return resp
+
+
+def _norm_omdb_resp(src):
+    """Normalization and transformation on the response from OMDB.
+
+    This function returns a copy and tries not to mutate the src passed in.
+
+    This function should be able to handle repeated calls on the same data.
+    """
+    resp = dict(src)
+
     for k in ['Actors', 'Director', 'Genre', 'Language', 'Writer']:
         v = resp.get(k, '')
         if not type(v) is list:

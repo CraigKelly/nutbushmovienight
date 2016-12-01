@@ -31,6 +31,7 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li><a href="{{url_for('main.bad_movie', imdbkey=movienight.imdbid)}}">Retry OMDB API</a></li>
+                    <li><a href="{{url_for('main.movie_override', imdbid=movienight.imdbid)}}">Enter Our Own Movie Data</a></li>
                 </ul>
             </div>
         {% endif %}

@@ -3,6 +3,8 @@
 These classes are active-record(-ish) via the gludb library
 """
 
+# pylama:ignore=D213
+
 import random
 from datetime import datetime
 
@@ -10,7 +12,8 @@ from gludb.simple import DBObject, Field, Index
 from flask import session, current_app
 
 from .log import app_logger
-from .remote import get_movie_data, norm_imdbid
+from .imdb import norm_imdbid
+from .remote import get_movie_data
 
 
 @DBObject(table_name='Users')
@@ -115,13 +118,58 @@ class Movie(object):
             dbobj = dbobj[0]
 
         if force or not dbobj.extdata or not dbobj.extdata.get('omdb', None):
-            dbobj.extdata = get_movie_data(imdbid)
+            # Check for override before asking for remote data
+            extdata = MovieOverride.find_by_imdb(imdbid)
+            if extdata:
+                extdata = extdata.extdata
+            else:
+                extdata = get_movie_data(imdbid)
+
+            dbobj.extdata = extdata
             ext_name = dbobj.extdata.get('omdb', {}).get('Title', '').strip()
             if ext_name:
                 dbobj.name = ext_name
             dbobj.save()
 
         return dbobj
+
+
+@DBObject(table_name="MovieOverrides")
+class MovieOverride(Movie):
+    """User-entered override for remote movie data.
+
+    The override itself is handled in Movie.find_by_imdb.
+
+    After saving a MovieOverride, you should be sure to use force=True in a
+    call to Movie.find_by_imdb
+    """
+
+    @classmethod
+    def find_by_imdb(cls, imdbid, force=False):
+        """Find helper.
+
+        Unlike our parent class, we are JUST a database lookup and WILL
+        return if nothing is found.
+        """
+        imdbid = norm_imdbid(imdbid)
+        if not imdbid:
+            raise ValueError('Missing IMDB ID - search is invalid')
+
+        dbobj = cls.find_by_index('index_imdbid', imdbid)
+        if not dbobj:
+            # Whoops - not even in database
+            return None
+        elif len(dbobj) > 1:
+            # We only want one object.
+            app_logger().warning("Dup movies found for IMDB id %s", imdbid)
+            for xtra in dbobj[1:]:
+                app_logger().warning(
+                    "Deleting dup movie imdbid:%s id:%s",
+                    xtra.id, xtra.imdbid
+                )
+                xtra.delete()
+
+        return dbobj[0]
 
 
 @DBObject(table_name="Attendees")
