@@ -8,14 +8,14 @@
 
 
 <div class="row">
-    <form id="override-form" method="post" action="{{url_for('main.movie_override_save', imdbid=over.imdbID)}}" class="form">
+    <form id="override-form" method="post" action="{{url_for('main.movie_override_save', imdbid=over.imdbID)}}" class="form form-horizontal">
 
     <div class="col-md-6 required-fields">
         <h2>Required Fields</h2>
 
         <div class="form-group">
         <label for="imdbID" class="control-label">IMDB ID</label>
-        <span class="form-control" id="imdbID" name="imdbID">{{ over.imdbID }}</span>
+        <p class="form-control-static" id="imdbID" name="imdbID">{{ over.imdbID }}</p>
         </div>
 
         <div class="form-group">
@@ -59,8 +59,8 @@
         </div>
     </div>
 
-    <div class="col-md-6">
-        <h3>Optional</h3>
+    <div class="col-md-offset-1 col-md-5">
+        <h2>Optional</h2>
 
         <div class="form-group">
         <label for="Production" class="control-label">Production</label>

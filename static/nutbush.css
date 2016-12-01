@@ -44,3 +44,16 @@
 .data-value {
     font-weight: normal;
 }
+
+.form .form-control {
+    border-left-color: #ddd;
+    border-left-width: 1px;
+    border-left-style: solid;
+    padding-left: 0.5em;
+}
+.form .form-control-static {
+    border-color: #777;
+    border-width: 1px;
+    border-style: solid;
+    padding-left: 0.5em;
+}
