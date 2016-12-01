@@ -63,11 +63,6 @@ app.register_blueprint(lawyer)
 @app.before_request
 def setup():
     """One-time setup work."""
-    # Copy some config settings in to the g object for other uses (like our
-    # template dict helpers in helpers.py). Note that we hard-code fallbacks
-    # just in case
-    setattr(g, 'DEFAULT_BS_THEME', app.config.get('DEFAULT_BS_THEME', 'darkly'))
-    setattr(g, 'DEFAULT_JQUI_THEME', app.config.get('DEFAULT_JQUI_THEME', 'vader'))
     setattr(g, 'year', datetime.now().year)
 
 

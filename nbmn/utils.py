@@ -5,12 +5,12 @@ import traceback
 import os.path as pth
 from functools import wraps
 
-from flask import abort, render_template, request, g, current_app
+from flask import abort, render_template, current_app
 
 from .log import app_logger
 from .model import User
 
-# pylama:ignore=E501
+# pylama:ignore=E501,D213
 
 
 def project_file(relpath):
@@ -29,14 +29,8 @@ def template_context(**kwrds):
     """
     usr = User.get_user()
 
-    # TODO: These cookies currently can't be set anywhere
-    bs_theme_name = request.cookies.get('bootswatch_theme', g.get('DEFAULT_BS_THEME'))
-    jqui_theme_name = request.cookies.get('jqueryui_theme', g.get('DEFAULT_JQUI_THEME'))
-
     default = {
-        'usr': usr,
-        'bootswatch_theme': bs_theme_name,
-        'jqueryui_theme': jqui_theme_name
+        'usr': usr
     }
     default.update(kwrds)
     return default
