@@ -131,11 +131,10 @@
 {% block extra_js %}
 <script type="text/javascript">
     $(function() {
-        // TODO: the date format isn't working - get it correct for `30 Nov 2016`
-        // $(".provide-date-picker").datepicker({
-        //     showButtonPanel: true,
-        //     dateFormat: "dd mmm yyyy"
-        // });
+        $(".provide-date-picker").datepicker({
+            showButtonPanel: true,
+            dateFormat: "dd M yy"
+        });
 
         $("#cmdcancel").click(function(event){
             event.preventDefault();
