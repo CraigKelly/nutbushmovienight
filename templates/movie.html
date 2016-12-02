@@ -30,6 +30,17 @@
                 <img id="det-movieimg" src="" alt="{{movie.name}}" class="img-responsive img-thumbnail"/>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-8">
+                <button class="btn btm-sm btn-primary" type="button" data-toggle="collapse" data-target="#collapsed-data" aria-expanded="false" aria-controls="collapsed-data">
+                <span class="glyphicon glyphicon-plus"></span> Extra Fields
+                </button>
+                <div class="collapse" id="collapsed-data">
+                    <div class="well" id="movie-extra-container">
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
 
     {% else %}
@@ -72,15 +83,15 @@ data.movie_by_imdb(imdbid, function(all_data, textStatus) {
         return;
     }
 
-    <!-- TODO: perhaps show imdb and rotten tomatoes data? -->
-
     console.log(all_data);
     var movie_data = all_data.omdb;
 
-    function addOne(title, disp) {
-        if (disp === null) {
-            disp = _.prop(movie_data, title);
+    function addOne(title, target) {
+        if (!target) {
+            target = "#movie-details-container";
         }
+
+        var disp = _.prop(movie_data, title);
         if (_.isArray(disp)) {
             disp = _.join(disp, ',');
         }
@@ -92,7 +103,8 @@ data.movie_by_imdb(imdbid, function(all_data, textStatus) {
         newEle.append(
             $('<div class="col-md-offset-1 col-md-10 data-value"></div>').text(disp)
         );
-        $("#movie-details-container").append(newEle);
+
+        $(target).append(newEle);
         return newEle;
     }
 
@@ -101,21 +113,37 @@ data.movie_by_imdb(imdbid, function(all_data, textStatus) {
         $("#det-movieimg").attr("src", img);
     }
 
-    addOne("Director", null);
-    addOne('Writer', null);
-    addOne("Actors", null);
-    addOne('Production', null);
-    addOne('Country', null);
-    addOne('Language', null);
-    addOne("Runtime", null);
-    addOne("Genre", null);
-    addOne("Year", null);
-    addOne('Released', null);
-    addOne('DVD', null);
-    addOne('Awards', null);
-    addOne('Rated', null);
-    addOne('Metascore', null);
-    addOne("Plot", null);
+    addOne('Director');
+    addOne('Writer');
+    addOne('Actors');
+    addOne('Production');
+    addOne('Country');
+    addOne('Language');
+    addOne('Runtime');
+    addOne('Genre');
+    addOne('Year');
+    addOne('Released');
+    addOne('DVD');
+    addOne('Awards');
+    addOne('Rated');
+    addOne('Metascore');
+    addOne("Plot");
+    addOne("BoxOffice");
+
+    addOne('imdbRating', '#movie-extra-container');
+    addOne('imdbVotes', '#movie-extra-container');
+    addOne('tomatoConsensus', '#movie-extra-container');
+    addOne('tomatoFresh', '#movie-extra-container');
+    addOne('tomatoImage', '#movie-extra-container');
+    addOne('tomatoMeter', '#movie-extra-container');
+    addOne('tomatoRating', '#movie-extra-container');
+    addOne('tomatoReviews', '#movie-extra-container');
+    addOne('tomatoRotten', '#movie-extra-container');
+    addOne('tomatoURL', '#movie-extra-container');
+    addOne('tomatoUserMeter', '#movie-extra-container');
+    addOne('tomatoUserRating', '#movie-extra-container');
+    addOne('tomatoUserReviews', '#movie-extra-container');
+    addOne('Poster', '#movie-extra-container');
 });
 {% endif %}
 </script>
