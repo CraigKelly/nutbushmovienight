@@ -111,6 +111,14 @@
         {% endif %}
     {% endwith %}
 
+    <!-- Error message used by our JS -->
+    <div class="row"><div class="col-md-12">
+        <div class="alert fade in" id="errorFromJS" style="display:none;">
+            <button type="button" class="close">×</button>
+            <span id="errorFromJSText"></span>
+        </div>
+    </div></div>
+
     {% block main_content %}
 
     <div class="row">
@@ -169,7 +177,7 @@
                             </div>
                         </div>
                         <div class="panel-body">
-                            <a href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}">
+                            <a href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}" class="movie-auto-click" data-imdbid="{{mn.imdbid}}">
                                 <img src="{{mn.thumb}}" class="img-responsive img-thumbnail img-movie-thumbnail pull-left" style="margin-right:1rem;">
                             </a>
 
@@ -227,6 +235,18 @@
     </div>
 </div>
 
+<!-- Movie dialog that any page can display -->
+<div class="dialog" id="movie-dialog" style="display:none;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8" id="moviedlg-details-container">
+            </div>
+            <div class="col-md-4">
+                <img id="moviedlg-movieimg" src="" class="img-responsive img-thumbnail"/>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- JAVASCRIPT RESOURCES -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
@@ -244,7 +264,105 @@
 <script type="text/javascript" src="/static/nutbush.js"></script>
 
 <script type="text/javascript">
-    $('.dropdown-toggle').dropdown();
+    // Available to everyone that needs to show an error
+    showJSError = function(err) {
+        $("#errorFromJSText").html(err);
+        $("#errorFromJS").show();
+        alert(err);
+    };
+
+    // Available to everyone that wants to display a movie
+    show_movie = function(imdbid) {
+        // Clean up any previous dialog stuff
+        $('#movie-dialog').dialog("close");
+        $("#moviedlg-details-container").empty();
+        $("#moviedlg-movieimg").attr("src", "");
+
+        // Make query
+        data.movie_by_imdb(imdbid, function(all_data, textStatus) {
+            if (all_data.error) {
+                showJSError(all_data.error);
+                return;
+            }
+
+            var movie_data = all_data.omdb;
+
+            function addOne(title, target) {
+                if (!target) {
+                    target = "#moviedlg-details-container";
+                }
+
+                var disp = _.prop(movie_data, title);
+                if (_.isArray(disp)) {
+                    disp = _.join(disp, ',');
+                }
+
+                var newEle = $('<div class="row"></div>');
+                newEle.append(
+                    $('<div class="col-md-1 data-name"></div>').text(title)
+                );
+                newEle.append(
+                    $('<div class="col-md-offset-1 col-md-10 data-value"></div>').text(disp)
+                );
+
+                $(target).append(newEle);
+                return newEle;
+            }
+
+            img = _.prop(movie_data, "Poster");
+            if (!!img) {
+                $("#moviedlg-movieimg").attr("src", img);
+            }
+
+            //TODO: link to open full movie info page
+            addOne('Director');
+            addOne('Writer');
+            addOne('Actors');
+            addOne('Production');
+            addOne('Country');
+            addOne('Language');
+            addOne('Runtime');
+            addOne('Genre');
+            addOne('Year');
+            addOne('Released');
+            addOne('DVD');
+            addOne('Awards');
+            addOne('Rated');
+            addOne('Metascore');
+            addOne("Plot");
+            addOne("BoxOffice");
+
+            $("#movie-dialog").dialog({
+                'modal': true,
+                'height': 'auto',
+                'width': 'auto',
+                'closeText': 'X',
+                'title': _.prop(movie_data, "Title")
+            }).dialog("open");
+        });
+    };
+
+    // Fired once page is done loading
+    $(function(){
+        // Set up dropdowns
+        $('.dropdown-toggle').dropdown();
+
+        // Set up dialog
+        $("#movie-dialog").dialog({autoOpen: false});
+
+        // Provide a class-based way for buttons to show movies
+        $('.movie-auto-click').click(function(evt){
+            evt.preventDefault()
+            var imdbid = $(this).data('imdbid');
+            if (!imdbid) {
+                console.log("No imdb to display!", imdbid);
+                return;
+            }
+
+            console.log("Displaying movie", imdbid);
+            show_movie(imdbid);
+        });
+    });
 </script>
 
 {% block extra_js %}

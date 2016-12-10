@@ -7,14 +7,6 @@
 {% endblock %}
 
 {% block main_content %}
-    <!-- Error message used by our JS -->
-    <div class="row"><div class="col-md-12">
-        <div class="alert fade in" id="errorFromJS" style="display:none;">
-            <button type="button" class="close">×</button>
-            <span id="errorFromJSText"></span>
-        </div>
-    </div></div>
-
     {% if movie %}
         {% if movie.imdbid %}
         <div class="row">
@@ -54,7 +46,7 @@
         <tbody>
         {% for mov in movies %}
             <tr>
-                <td><a href="{{url_for('main.movie_display', moviekey=mov.imdbid)}}">{{mov.name}}</a></td>
+                <td><a class="movie-auto-click" data-imdbid="{{mov.imdbid}}" href="{{url_for('main.movie_display', moviekey=mov.imdbid)}}">{{mov.name}}</a></td>
             </tr>
         {% endfor %}
         </tbody>
@@ -74,12 +66,11 @@ $('#allmovies').dataTable({
 });
 
 {% if movie and movie.imdbid %}
+
 var imdbid = "{{movie.imdbid}}";
 data.movie_by_imdb(imdbid, function(all_data, textStatus) {
     if (all_data.error) {
-        $("#errorFromJSText").html(all_data.error);
-        $("#errorFromJS").show();
-        alert(all_data.error);
+        showJSError(all_data.error);  // defined for us in base.html
         return;
     }
 
