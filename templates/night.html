@@ -19,7 +19,7 @@
         <br />
         {{ movie_night_name }}
         &nbsp;
-        <a href="{{url_for('main.movie_display', moviekey=movienight.imdbid)}}" class="btn btn-sm btn-primary">
+        <a href="{{url_for('main.movie_display', moviekey=movienight.imdbid)}}" class="btn btn-sm btn-primary movie-auto-click" data-imdbid="{{movienight.imdbid}}">
             <span class="glyphicon glyphicon-facetime-video"></span>
             Movie
         </a>

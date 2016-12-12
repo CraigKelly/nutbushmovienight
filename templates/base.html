@@ -346,14 +346,9 @@
         });
     };
 
-    // Fired once page is done loading
-    $(function(){
-        // Set up dropdowns
-        $('.dropdown-toggle').dropdown();
-
-        // Set up dialog
-        $("#movie-dialog").dialog({autoOpen: false});
-
+    // Make this callable so that pages that dynamically create content can
+    // reset movie-auto-click elements
+    movieAutoClickSetup = function() {
         // Provide a class-based way for buttons to show movies
         $('.movie-auto-click').click(function(evt){
             evt.preventDefault()
@@ -366,6 +361,18 @@
             console.log("Displaying movie", imdbid);
             show_movie(imdbid);
         });
+    };
+
+    // Fired once page is done loading
+    $(function(){
+        // Set up dropdowns
+        $('.dropdown-toggle').dropdown();
+
+        // Set up dialog
+        $("#movie-dialog").dialog({autoOpen: false});
+
+        // Provide a class-based way for buttons to show movies
+        movieAutoClickSetup();
     });
 </script>
 

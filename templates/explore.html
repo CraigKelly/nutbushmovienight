@@ -6,11 +6,93 @@
 {% block main_content %}
 
 <div class="row">
-<div class="col-md-12">
-    Need to setup, need to hit gimme, need an interface, need rollovers for nights and movie, etc
-    <div id="progressInfo" class="well"></div>
+    <div class="col-md-12">
+        Right now we only have full-text search, but we'll have more one day
+        <div id="progressInfo" class="well"></div>
+    </div>
 </div>
+
+<div class="row">
+    <div class="col-md-12 form form-inline">
+        <div class="form-group">
+            <label for="text-search" class="control-label">Full Search</label>
+            <input type="text" class="form-control" name="text-search" id="text-search" placeholder="Anything" value="">
+            <button class="btn btn-sm" id="text-search-btn"><span class="glyphicon glyphicon-search"></span></button>
+        </div>
+    </div>
 </div>
+
+<br />
+
+<div class="row" id="search-results-container" style="display:flex; flex:1 1 auto; flex-flow:row wrap; align-content:flex end;">
+</div>
+
+<script type="text/template" class="searchResultsTemplate">
+    <%
+        function dateFmt(datestr) {
+            if (datestr.length != 8)
+                return datestr;
+
+            yr = datestr.substr(0, 4);
+            mth = datestr.substr(4, 2);
+            day = datestr.substr(6, 2);
+            console.log(yr, mth, day);
+            if (mth >= '01' && mth <= '12') {
+                mthx = {
+                    '01': 'Jan',
+                    '02': 'Feb',
+                    '03': 'Mar',
+                    '04': 'Apr',
+                    '05': 'May',
+                    '06': 'Jun',
+                    '07': 'Jul',
+                    '08': 'Aug',
+                    '09': 'Sep',
+                    '10': 'Oct',
+                    '11': 'Nov',
+                    '12': 'Dec',
+                }[mth] || mth;
+            }
+            return mthx + ' ' + day + ', ' + yr;
+        }
+    %>
+
+    <% _.forEach(ctx.results, function(result) {
+        var movie = result.movie;
+        var night = result.night;
+        var omdb = _.prop(movie.extdata, 'omdb');
+    %>
+        <div class="col-md-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    <a href="/night/<%= night.datestr%>">
+                        <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>
+                        <%= dateFmt(night.datestr)%>
+                    </a>
+                </div>
+            </div>
+            <div class="panel-body">
+                <a href="#" class="movie-auto-click" data-imdbid="<%= movie.imdbid%>">
+                    <img src="<%= _.prop(omdb, 'Poster')%>" class="img-responsive img-thumbnail img-movie-thumbnail pull-left" style="margin-right:1rem;">
+                </a>
+
+                <a href="#" class="movie-auto-click" data-imdbid="<%= movie.imdbid%>">
+                    <%= movie.name%>
+                </a>
+                <br />
+                <a href="/night/<%= night.datestr%>">
+                    <%= night.dinner%>
+                </a>
+                <br />
+                <% _.forEach(night.attendees, function(person){ %>
+                    <a href="/person/<%= person%>"><%= person%></a>
+                <% }) %>
+            </div>
+        </div>
+        </div>
+    <% }); %>
+</script>
 
 {% endblock %}
 
@@ -21,23 +103,74 @@
         'nights': [],
         'attendees': [],
         'movies': [],
+        'movie_xref': {}
     };
 
+    var searchResultsTemplate = _.template(
+        $("script.searchResultsTemplate").html(),
+        { 'variable': 'ctx' }
+    );
+
+    // Where predicate is function(night, movie) and returns true/false
+    function search_all(searchTitle, predicate) {
+        $("#search-results-container").empty();
+
+        var results = [];
+
+        _.each(all_data.nights, function(night) {
+            var movie = all_data.movie_xref[night.imdbid];
+            if (movie && predicate(night, movie)) {
+                results.push({'movie': movie, 'night': night});
+            }
+        });
+
+        $("#progressInfo").text("Search for " + searchTitle + " found " + results.length + " results");
+
+        $("#search-results-container").append(
+            searchResultsTemplate({'results': results})
+        );
+        movieAutoClickSetup();  // Handle auto click elements we just created
+    }
+
     $(function() {
-        $("#progressInfo").text("Loading data..."); //TODO: nicer loading msg with icon
+        $("#progressInfo").text("Loading data...");
         data.all_data(data_endpoint,
             // success
             function(data, textStatus) {
-                //TODO: set up querying and show some stats
                 all_data = data;
+                all_data.movie_xref = {};
+
+                _.each(all_data.movies, function(movie){
+                    if (movie && movie.imdbid) {
+                        all_data.movie_xref[movie.imdbid] = movie;
+                    }
+                });
+
                 $("#progressInfo").text("Total Nights:" + _(all_data).prop("nights").prop("length").value());
             },
             // error
             function(request, textStatus, errorThrown) {
-                //TODO: better error reporting, shut down querying, and have a retry button
                 $("#progressInfo").text(textStatus + ": " + errorThrown);
             }
         );
+
+        $("#text-search").keyup(function(evt){
+            if (evt.keyCode == 13) {
+                $("#text-search-btn").click();
+            }
+        });
+
+        $("#text-search-btn").click(function(evt){
+            evt.preventDefault();
+            var txt = $("#text-search").val().toLowerCase();
+            if (!txt) {
+                alert("Nothing to search!");
+                return;
+            }
+            search_all(txt, function(night, movie){
+                return JSON.stringify({'_n':night, '_m':movie}).toLowerCase().indexOf(txt) >= 0;
+            });
+        });
     });
 </script>
 {% endblock %}

@@ -12,8 +12,6 @@ setup.
 
 # TODO: allow image uploads and usage with our ckeditor
 
-# TODO: full text search with a mongo text index *or something*
-
 
 import os
 import logging
