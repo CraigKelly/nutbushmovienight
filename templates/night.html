@@ -93,7 +93,7 @@
         {% for mn in movienights %}
             <tr>
                 <td class="nw"><a href="{{url_for('main.night_display', datestr=mn.datestr)}}">{{mn.listdate_js}}</a></td>
-                <td><a href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}">{{mn.moviename}}</a></td>
+                <td><a class="movie-auto-click" data-imdbid="{{mn.imdbid}}" href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}">{{mn.moviename}}</a></td>
                 <td>{{mn.dinner}}</td>
             </tr>
         {% endfor %}
@@ -116,7 +116,7 @@
         ],
         "order": [[ 0, "desc" ]],
         "paging": false,
-        "responsive": true,
+        //"responsive": true,
     });
     </script>
 

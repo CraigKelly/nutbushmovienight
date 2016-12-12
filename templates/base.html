@@ -16,11 +16,11 @@
 
 <link type="text/plain" rel="author" href="{{SITEURL}}/humans.txt" />
 
-<link href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" rel="stylesheet">
-<link href="//cdn.datatables.net/responsive/1.0.3/css/dataTables.responsive.css" rel="stylesheet">
-<link href="//cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.dataTables.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet">
 
-<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/humanity/jquery-ui.css" rel="stylesheet" />
+<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/redmond/jquery-ui.css" rel="stylesheet" />
 <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css" rel="stylesheet">
 
 <link rel="stylesheet" href="/static/nutbush.css" type="text/css">
@@ -181,7 +181,7 @@
                                 <img src="{{mn.thumb}}" class="img-responsive img-thumbnail img-movie-thumbnail pull-left" style="margin-right:1rem;">
                             </a>
 
-                            <a href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}">
+                            <a href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}" class="movie-auto-click" data-imdbid="{{mn.imdbid}}">
                                 {{mn.moviename}}
                             </a>
                             <br>
@@ -249,17 +249,17 @@
 </div>
 
 <!-- JAVASCRIPT RESOURCES -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
 
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
-
-<script type="text/javascript" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="//cdn.datatables.net/responsive/1.0.3/js/dataTables.responsive.js"></script>
-<script type="text/javascript" src="//cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
-
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
 <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Note that above we need to load jQuery before bootstrap, but THEN we load jquery UI and other stuff later -->
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+<!-- <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.1.0/js/dataTables.responsive.min.js"></script> -->
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
 
 <script type="text/javascript" src="/static/nutbush.js"></script>
 
@@ -314,7 +314,6 @@
                 $("#moviedlg-movieimg").attr("src", img);
             }
 
-            //TODO: link to open full movie info page
             addOne('Director');
             addOne('Writer');
             addOne('Actors');
@@ -332,11 +331,16 @@
             addOne("Plot");
             addOne("BoxOffice");
 
+            $("#moviedlg-details-container").append(
+                $('<div class="row"><div class="col-md-offset-1 col-md-8"><a id="movie-detail-link">Go to Movie Detail Page</a></div></div>')
+            );
+            $("#movie-detail-link").attr("href", "/movie/" + imdbid)
+
             $("#movie-dialog").dialog({
                 'modal': true,
                 'height': 'auto',
                 'width': 'auto',
-                'closeText': 'X',
+                //'closeText': 'X',
                 'title': _.prop(movie_data, "Title")
             }).dialog("open");
         });
