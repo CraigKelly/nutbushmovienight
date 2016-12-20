@@ -2,7 +2,7 @@
 
 import unittest
 
-from nbmn.remote import norm_imdbid
+from nbmn.imdb import norm_imdbid
 
 
 class RemoteHelperTesting(unittest.TestCase):

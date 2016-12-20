@@ -21,7 +21,7 @@ from gludb.config import class_database, Database
 from gludb.simple import DBObject
 
 from .model import Movie, Night, Attendee
-from .remote import norm_imdbid
+from .imdb import norm_imdbid
 
 COMMANDS = dict()
 
@@ -103,8 +103,6 @@ def run(opts):
 @command
 def testrun(opts):
     """Execute ./run script using test/test.config as the main config."""
-    # env = os.environ.copy()
-    # env['NBMN_CONFIG'] = os.path.abspath('./test/test.config')
     with env_var('NBMN_CONFIG', os.path.abspath('./test/test.config')):
         return subprocess.run(["./run"] + opts).returncode
 
@@ -209,16 +207,16 @@ def postgre(opts):
     conn_string = ' '.join(opts)
     print("Using conn str: %s" % conn_string)
 
+    tables = [NightOutput, MovieOutput, AttendeeOutput]
+    table_names = [t.get_table_name() for t in tables]
+
     print("Dropping postgresql tables...")
     import psycopg2
     with psycopg2.connect(conn_string) as conn:
         with conn.cursor() as cur:
-            print("Dropping %s", NightOutput.get_table_name())
-            cur.execute("drop table if exists " + NightOutput.get_table_name())
-            print("Dropping %s", MovieOutput.get_table_name())
-            cur.execute("drop table if exists " + MovieOutput.get_table_name())
-            print("Dropping %s", AttendeeOutput.get_table_name())
-            cur.execute("drop table if exists " + AttendeeOutput.get_table_name())
+            for tabname in table_names:
+                print("Dropping %s" % tabname)
+                cur.execute("drop table if exists " + tabname)
 
     alternate_copy(
         Database("postgresql", conn_string=conn_string),

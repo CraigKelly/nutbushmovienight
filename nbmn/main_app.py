@@ -16,6 +16,7 @@ from flask import (
     url_for
 )
 
+from .imdb import norm_imdbid
 from .log import app_logger
 from .auth import NotAuthorized, require_login
 from .utils import logged_errors, template, templated, use_error_page, project_file
@@ -225,6 +226,7 @@ def night_save(datestr):
     Attendee.ensure_attendees(night.attendees)
 
     # Perform any validation we might need and then act
+    night.insure_data()
     errors = list(validate_night(night))
     if errors:
         # Oops!
@@ -297,7 +299,6 @@ def movie_override(imdbid):
     if not user or user.utype != "admin":
         raise NotAuthorized("You lack the requisite coolness to override movies")
 
-    from .remote import norm_imdbid
     imdbid = norm_imdbid(imdbid)
 
     over = MovieOverride.find_by_imdb(imdbid)

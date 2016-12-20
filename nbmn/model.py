@@ -244,8 +244,13 @@ class Night(object):
     DATE_FMT = "%Y%m%d"
 
     def setup(self, *args, **kwrds):
-        """Insure datestr is a str."""
+        """Insure fields are ok."""
+        self.insure_data()
+
+    def insure_data(self):
+        """Provide a method to insure all the fields are correct."""
         self.datestr = self.str_from_date(self.datestr)
+        self.imdbid = norm_imdbid(self.imdbid)
 
     @Index
     def index_datestr(self):
