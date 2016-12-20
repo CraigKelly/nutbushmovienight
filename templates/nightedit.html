@@ -8,7 +8,7 @@
 {% block main_content %}
 
 <div class="row">
-    <form method="post" action="{{url_for('main.night_display', datestr=movienight.datestr, mode=mode)}}" class="form">
+    <form method="post" action="{{url_for('main.night_save', datestr=movienight.datestr, mode=mode)}}" class="form">
 
     <div class="col-md-6">
         <h2>Movie Night</h2>
