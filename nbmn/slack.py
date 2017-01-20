@@ -7,6 +7,12 @@ with the variable `SLACK_HOOK`
 
 # pylama:ignore=D213,E501
 
+# TODO: Add slack commands for querying for nights and movies
+# https://api.slack.com/slash-commands
+# /night <date> returns details of that movie night (need code for lots of date format checking)
+# /movie <imdbid> returns details for that movie and any nights on which it was watched
+# ALSO - check <imdbid> above... if it doesn't match an imdb pattern, then treat it as a title search IN AN ASYNC PROCESS
+
 import requests
 from flask import current_app
 
