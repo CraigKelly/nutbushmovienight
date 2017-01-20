@@ -10,7 +10,18 @@ setup.
 
 # pylama:ignore=E501,D212
 
-# TODO: allow link selection from nbmn flickr account
+# TODO: allow link selection from nbmn flickr account...
+# We would get the images using a call to flickr.people.getPublicPhotos for 65666367@N06
+# (see https://www.flickr.com/services/api/explore/flickr.people.getPublicPhotos)
+#
+# For each entry we would construct an image link with the pattern
+# https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_[mstzb].jpg where
+#
+# m - small
+# s - super small (smaller than thumbnail)
+# t - thumbnail
+# z - medium
+# b - large
 
 
 import os
