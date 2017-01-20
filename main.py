@@ -10,7 +10,7 @@ setup.
 
 # pylama:ignore=E501,D212
 
-# TODO: allow image uploads and usage with our ckeditor
+# TODO: allow link selection from nbmn flickr account
 
 
 import os

@@ -20,7 +20,6 @@ def _to_dict(obj):
 @data.route('/gimme')
 def data_dump():
     """Return all night/movie data in JSON format for client-side analysis."""
-    # TODO: handle movie overrides in movies list
     return jsonify({
         'attendees': [_to_dict(a) for a in Attendee.find_all()],
         'nights': [_to_dict(n) for n in Night.find_all()],
