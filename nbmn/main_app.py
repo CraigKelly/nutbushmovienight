@@ -9,7 +9,9 @@ from operator import attrgetter
 from flask import (
     abort,
     Blueprint,
+    current_app,
     flash,
+    g,
     jsonify,
     redirect,
     request,
@@ -21,6 +23,7 @@ from .log import app_logger
 from .auth import NotAuthorized, require_login
 from .utils import logged_errors, template, templated, use_error_page, project_file
 from .model import User, Movie, Night, Attendee, MovieOverride
+from .slack import notify
 
 main = Blueprint('main', __name__)
 
@@ -203,6 +206,7 @@ def night_save(datestr):
             # Delete requested
             app_logger().info("Delete requested for Night %s", datestr)
             night.delete()
+            notify("%s just deleted %s", g.user.email, datestr)
             return redirect(url_for('main.main_page'))
 
     # Populate the "easy" fields
@@ -235,7 +239,15 @@ def night_save(datestr):
     else:
         # Yippee!
         night.save()
-        return redirect(url_for("main.night_display", datestr=night.datestr))
+        night_url = url_for("main.night_display", datestr=night.datestr)
+        notify(
+            "%s just saved data for movie night: %s\nSee it here: <%s%s>",
+            g.user.email,
+            night.listdate,
+            current_app.config.get("SLACK_URL_BASE", ""),
+            night_url
+        )
+        return redirect(night_url)
 
 
 def validate_night(night):
