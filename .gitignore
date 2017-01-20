@@ -3,8 +3,12 @@
 .pydevproject
 Thumbs.db
 .metadata
-venv
+venv/
 current.config
 .testingdb.sqlite
-__pycache__
+__pycache__/
 postgresql-import.log
+
+# We actually have this committed to git, but we want .gitignore-aware tools
+# to exclude it (e.g. todo-show in Atom)
+static/ckeditor/
