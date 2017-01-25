@@ -35,6 +35,9 @@ variable is missing, `run` will look for the file `current.config` (which has
 been conveniently added to `.gitignore`) and automatically set `NBMN_CONFIG`
 to the path of the file.
 
+Note that you'll need to supply some info for all features to work (like Google
+logins, Slack integration, Flickr stream selection, etc.)
+
 ## Tools
 
 The `tools` script can run the application, run unit tests, and has some other
