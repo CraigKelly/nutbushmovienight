@@ -49,3 +49,8 @@ Go to the Google developer's console and set credentials for you app (which
 you might need to create). The redirect URL should be `/oauthcallback` (the
 default). Be sure to add localhost so that you can test on your local box
 (e.g. http://localhost:8081/oauthcallback)
+
+## Slack Props
+
+See https://api.slack.com/incoming-webhooks for creating the Slack "hook".
+The URL base is how links sent to the Slack channel are prefixed.
