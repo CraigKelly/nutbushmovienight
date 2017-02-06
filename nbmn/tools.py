@@ -15,6 +15,7 @@ part of the package).
 import sys
 import os
 import subprocess
+import argparse
 from contextlib import contextmanager
 
 from gludb.config import class_database, Database
@@ -78,7 +79,7 @@ def help(opts):
     print("")
 
     def line(cmd, descrip):
-        print("%-10s   %s" % (cmd, descrip))
+        print("%-12s   %s" % (cmd, descrip))
 
     line("Command", "Description")
     line("-------", "-----------")
@@ -157,6 +158,55 @@ def fixpeeps(opts):
         for name in missing:
             print("Creating:" + name)
             Attendee(name=name).save()
+    print("Finished.")
+
+
+@command
+def orphanmovies(opts):
+    """Find all movies that are not attached to a Movie Night."""
+    parser = argparse.ArgumentParser(description=orphanmovies.__doc__)
+    parser.add_argument("--delete", default=False, action="store_true", help="Delete orphans")
+    parser.add_argument("--verbose", default=False, action="store_true", help="Output full orphan output")
+    args = parser.parse_args(opts)
+
+    def delete_movie(movie):
+        if args.delete:
+            movie.delete()
+            print("DELETED!")
+
+    def orphan_text(movie):
+        if args.verbose:
+            return movie.to_data()
+        else:
+            return "[%s]:%s" % (norm_imdbid(movie.imdbid), movie.name)
+
+    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
+        print("Configuring database backend")
+        import main
+        main.database_config()
+
+        print("Scanning Nights...")
+        night_movies = set()
+        night_count = 0
+        for night in Night.find_all():
+            night_count += 1
+            imdbid = norm_imdbid(night.imdbid)
+            if imdbid:
+                night_movies.add(imdbid)
+        print("...Found %d IMDB ID's in %d nights" % (len(night_movies), night_count))
+
+        print("Scanning Movies...")
+        orphan_count = 0
+        for movie in Movie.find_all():
+            imdbid = norm_imdbid(movie.imdbid)
+            if imdbid in night_movies:
+                continue
+
+            orphan_count += 1
+            print("ORPHAN: %s" % orphan_text(movie))
+            delete_movie(movie)
+        print("...Found %d orphan movies" % orphan_count)
+
     print("Finished.")
 
 
