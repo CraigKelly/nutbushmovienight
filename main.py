@@ -10,6 +10,8 @@ setup.
 
 # pylama:ignore=E501,D212
 
+# TODO: need to use OMDB Poster API before falling back to other links in data
+
 # TODO: allow link selection from nbmn flickr account...
 # We would get the images using a call to flickr.people.getPublicPhotos for 65666367@N06
 # (see https://www.flickr.com/services/api/explore/flickr.people.getPublicPhotos)

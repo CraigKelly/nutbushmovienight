@@ -59,6 +59,8 @@ Many of the fields might contain "N/A" (Not Applicable).
 from datetime import datetime
 import requests
 
+from flask import current_app
+
 from .imdb import norm_imdbid
 
 
@@ -80,6 +82,25 @@ def get_movie_data(imdbid):
     }
 
 
+def create_omdb_get(omdb_id, base="http://www.omdbapi.com/"):
+    """Return a requests GET for OMDB API."""
+    apikey = current_app.config.get("OMDB_API_KEY", "").strip()
+    if not apikey:
+        raise ValueError("No OMDB API Key supplied in configuration!")
+
+    omdb_id = norm_imdbid(omdb_id)
+    if not omdb_id:
+        return None
+
+    return requests.get(base, params={
+        'apikey':   apikey,
+        'i':        omdb_id,
+        'r':        'json',
+        'tomatoes': 'true',
+        'plot':     'short',
+    })
+
+
 # Simple mapper from omdbapi.com to the format we expect from rot tom
 # in imdb format
 def _omdb_get(omdb_id):
@@ -88,12 +109,7 @@ def _omdb_get(omdb_id):
     if not omdb_id:
         return dict()
 
-    resp = requests.get("http://www.omdbapi.com/", params={
-        'i':        omdb_id,
-        'r':        'json',
-        'tomatoes': 'true',
-        'plot':     'short',
-    }).json()
+    resp = create_omdb_get(omdb_id).json()
 
     if resp.get("Response", "").lower() != "true":
         return dict()
@@ -140,7 +156,7 @@ def _norm_omdb_resp(src):
         if v:
             try:
                 v = func(v)
-            except:
+            except:  # NOQA
                 v = "NaN"
             resp[k] = v
 
