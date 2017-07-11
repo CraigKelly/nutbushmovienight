@@ -10,6 +10,8 @@ setup.
 
 # pylama:ignore=E501,D212
 
+# TODO; make sure our set up works even without pyenv
+
 # TODO: see about using daiquiri for logging: be sure to log at tools
 
 # TODO: need to use OMDB Poster API before falling back to other links in data
