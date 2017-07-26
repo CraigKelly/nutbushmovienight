@@ -39,10 +39,12 @@ def env_var(key, value):
         os.environ[key] = old_val
 
 
-def command(f):
+def command(need_db=False):
     """Decorator for capturing commands."""
-    COMMANDS[f.__name__] = f
-    return f
+    def dec(f):
+        COMMANDS[f.__name__] = (f, need_db)
+        return f
+    return dec
 
 
 def usage(msg=""):
@@ -72,96 +74,89 @@ class AttendeeOutput(Attendee):
     pass
 
 
-@command
+@command(need_db=False)
 def help(opts):
     """Print out documentation."""
     usage("Helping!")
     print("")
 
-    def line(cmd, descrip):
-        print("%-12s   %s" % (cmd, descrip))
+    def line(cmd, ndb, descrip):
+        print("%-12s %-8s   %s" % (cmd, ndb, descrip))
 
-    line("Command", "Description")
-    line("-------", "-----------")
-    for name, func in sorted(COMMANDS.items()):
-        line(name, func.__doc__)
+    line("Command", "NeedDB", "Description")
+    line("-------", "------", "-----------")
+    for name, (func, need_db) in sorted(COMMANDS.items()):
+        line(name, need_db, func.__doc__)
     return 0
 
 
-@command
+@command(need_db=False)
 def test(opts):
     """Execute unit tests."""
     import nose
     nose.main(argv=['nosetests'] + opts)
 
 
-@command
+@command(need_db=False)
 def run(opts):
     """Execute ./run script - just for debugging."""
     return subprocess.run(["./run"] + opts).returncode
 
 
-@command
+@command(need_db=False)
 def testrun(opts):
     """Execute ./run script using test/test.config as the main config."""
     with env_var('NBMN_CONFIG', os.path.abspath('./test/test.config')):
         return subprocess.run(["./run"] + opts).returncode
 
 
-@command
+@command(need_db=True)
 def fixmovies(opts):
     """Re-query remote sources for every movie in the DB."""
-    print("Configuring database backend")
-    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
-        import main
-        main.database_config()
-        movies = set([""])  # Will remove empty string when done
+    movies = set([""])  # Will remove empty string when done
 
-        print("Scanning Nights...")
-        for night in Night.find_all():
-            movies.add(norm_imdbid(night.imdbid))
+    print("Scanning Nights...")
+    for night in Night.find_all():
+        movies.add(norm_imdbid(night.imdbid))
 
-        print("Scanning Movies...")
-        for movie in Movie.find_all():
-            movies.add(norm_imdbid(movie.imdbid))
+    print("Scanning Movies...")
+    for movie in Movie.find_all():
+        movies.add(norm_imdbid(movie.imdbid))
 
-        movies.remove("")  # as promised
-        print("...Found %d unique movie ID's" % len(movies))
+    movies.remove("")  # as promised
+    print("...Found %d unique movie ID's" % len(movies))
 
-        for imdbid in movies:
-            movie = Movie.find_by_imdb(imdbid, force=True)
-            print("Searched %s: Found %s => %s" % (imdbid, movie.imdbid, movie.name))
+    for imdbid in movies:
+        movie = Movie.find_by_imdb(imdbid, force=True)
+        print("Searched %s: Found %s => %s" % (imdbid, movie.imdbid, movie.name))
 
     print("Finished.")
 
 
-@command
+@command(need_db=True)
 def fixpeeps(opts):
     """Create any necessary Attendee records using current.config."""
-    print("Configuring database backend")
-    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
-        import main
-        main.database_config()
-        print("Scanning Nights...")
-        night_count = 0
-        attendees = set()
-        for night in Night.find_all():
-            attendees.update(night.attendees)
-            night_count += 1
-        print("...Found %d attendees in %d nights" % (len(attendees), night_count))
+    print("Scanning Nights...")
+    night_count = 0
+    attendees = set()
+    for night in Night.find_all():
+        attendees.update(night.attendees)
+        night_count += 1
+    print("...Found %d attendees in %d nights" % (len(attendees), night_count))
 
-        print("Scanning Attendee...")
-        existing = set([a.name for a in Attendee.find_all()])
-        missing = attendees - existing
-        print("...Found %d attendees - need %d" % (len(existing), len(missing)))
+    print("Scanning Attendee...")
+    existing = set([a.name for a in Attendee.find_all()])
+    missing = attendees - existing
+    print("...Found %d attendees - need %d" % (len(existing), len(missing)))
 
-        for name in missing:
-            print("Creating:" + name)
-            Attendee(name=name).save()
+    for name in missing:
+        print("Creating:" + name)
+        Attendee(name=name).save()
+
     print("Finished.")
 
 
-@command
+@command(need_db=True)
 def orphanmovies(opts):
     """Find all movies that are not attached to a Movie Night."""
     parser = argparse.ArgumentParser(description=orphanmovies.__doc__)
@@ -180,36 +175,32 @@ def orphanmovies(opts):
         else:
             return "[%s]:%s" % (norm_imdbid(movie.imdbid), movie.name)
 
-    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
-        print("Configuring database backend")
-        import main
-        main.database_config()
+    print("Scanning Nights...")
+    night_movies = set()
+    night_count = 0
+    for night in Night.find_all():
+        night_count += 1
+        imdbid = norm_imdbid(night.imdbid)
+        if imdbid:
+            night_movies.add(imdbid)
+    print("...Found %d IMDB ID's in %d nights" % (len(night_movies), night_count))
 
-        print("Scanning Nights...")
-        night_movies = set()
-        night_count = 0
-        for night in Night.find_all():
-            night_count += 1
-            imdbid = norm_imdbid(night.imdbid)
-            if imdbid:
-                night_movies.add(imdbid)
-        print("...Found %d IMDB ID's in %d nights" % (len(night_movies), night_count))
+    print("Scanning Movies...")
+    orphan_count = 0
+    for movie in Movie.find_all():
+        imdbid = norm_imdbid(movie.imdbid)
+        if imdbid in night_movies:
+            continue
 
-        print("Scanning Movies...")
-        orphan_count = 0
-        for movie in Movie.find_all():
-            imdbid = norm_imdbid(movie.imdbid)
-            if imdbid in night_movies:
-                continue
-
-            orphan_count += 1
-            print("ORPHAN: %s" % orphan_text(movie))
-            delete_movie(movie)
-        print("...Found %d orphan movies" % orphan_count)
+        orphan_count += 1
+        print("ORPHAN: %s" % orphan_text(movie))
+        delete_movie(movie)
+    print("...Found %d orphan movies" % orphan_count)
 
     print("Finished.")
 
-
+# IMPORTANT: handlers calling this function must have need_db=True in their
+# command decorator
 def alternate_copy(glu_database, log_file):
     """Copy all data to the alternate gludb database location."""
     print("Configuring logging to use %s" % log_file)
@@ -220,34 +211,29 @@ def alternate_copy(glu_database, log_file):
     log = logging.getLogger()
     log.addHandler(stdout_handler)
 
-    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
-        log.warn("Starting main database config")
-        import main
-        main.database_config()
+    class_database(AttendeeOutput, glu_database)
+    class_database(MovieOutput, glu_database)
+    class_database(NightOutput, glu_database)
+    log.warn("Creating output tables...")
+    AttendeeOutput.ensure_table()
+    NightOutput.ensure_table()
+    MovieOutput.ensure_table()
 
-        class_database(AttendeeOutput, glu_database)
-        class_database(MovieOutput, glu_database)
-        class_database(NightOutput, glu_database)
-        log.warn("Creating output tables...")
-        AttendeeOutput.ensure_table()
-        NightOutput.ensure_table()
-        MovieOutput.ensure_table()
+    def xfer(name, in_table, out_table):
+        log.warn("Transferring %s..." % name)
+        count = 0
+        for record in in_table.find_all():
+            out_table.from_data(record.to_data()).save()
+            count += 1
+        log.warn("...Saved %d" % count)
 
-        def xfer(name, in_table, out_table):
-            log.warn("Transferring %s..." % name)
-            count = 0
-            for record in in_table.find_all():
-                out_table.from_data(record.to_data()).save()
-                count += 1
-            log.warn("...Saved %d" % count)
-
-        xfer("attendees", Attendee, AttendeeOutput)
-        xfer("nights", Night, NightOutput)
-        xfer("movies", Movie, MovieOutput)
-        log.warn("Finished.")
+    xfer("attendees", Attendee, AttendeeOutput)
+    xfer("nights", Night, NightOutput)
+    xfer("movies", Movie, MovieOutput)
+    log.warn("Finished.")
 
 
-@command
+@command(need_db=True)
 def postgre(opts):
     """Read movies and nights using current.config and write to postgresql."""
     if len(opts) < 1:
@@ -274,7 +260,7 @@ def postgre(opts):
     )
 
 
-@command
+@command(need_db=True)
 def export(opts):
     """Read all major data into specified sqlite database file."""
     if len(opts) != 1:
@@ -296,11 +282,20 @@ def main():
         return usage("No command specified")
 
     cmd, opts = args[0], args[1:]
-    cmd_func = COMMANDS.get(cmd, None)
+    cmd_func, need_db = COMMANDS.get(cmd, (None, None))
     if not cmd_func:
         return usage("Unknown cmd " + cmd)
 
-    return cmd_func(opts)
+    # Super simple
+    if not need_db:
+        return cmd_func(opts)
+
+    # Set up main db and app context with a set config
+    with env_var('NBMN_CONFIG', os.path.abspath('./current.config')):
+        import main
+        main.database_config()
+        with main.app.app_context():
+            return cmd_func(opts)
 
 
 if __name__ == '__main__':
