@@ -5,7 +5,7 @@ Flask-Dance==0.8.3  # For OAuth2
 
 # Data connections - We use the latest code for gludb and currently grab deps
 # for both mongo and postgres
-git+git://github.com/memphis-iis/GLUDB
+git+https://github.com/memphis-iis/GLUDB
 pymongo==3.2.2
 psycopg2==2.6.1
 
