@@ -1,0 +1,21 @@
+[[source]]
+
+verify_ssl = true
+url = "https://pypi.python.org/simple"
+name = "pypi"
+
+
+[dev-packages]
+
+nose = "*"
+
+[packages]
+
+flask = "*"
+blinker = "*"
+flask-dance = "*"
+gludb = {editable = true, git = "https://github.com/memphis-iis/GLUDB"}
+"psycopg2" = "*"
+pymongo = "*"
+requests = "*"
+waitress = "*"

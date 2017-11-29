@@ -10,7 +10,7 @@ Built with flask and should run behind a proxy like caddy or nginx.
 
 ## First Things first
 
-Make sure to `./setup` to bootstrap the virtualenv properly.
+Get `pipenv` and run `./setup` to bootstrap everything.
 
 ## Running
 

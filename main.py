@@ -123,7 +123,7 @@ def database_config():
 
 def main():
     """Entry point."""
-    HOST = app.config['HOST']
+    HOST = app.config['HOST'] or '0.0.0.0'
     PORT = app.config['PORT']
     BANNER = app.config['BANNER']
 

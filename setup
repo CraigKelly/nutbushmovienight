@@ -4,25 +4,13 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $SCRIPT_DIR
 
 echo -e "\033[32mStarting nubushmovienight setup in $(pwd)...\033[0m"
+echo "This will required pipenv to already be installed!"
 
-if [ -d venv ];
-then
-    source $SCRIPT_DIR/venv/bin/activate
-    echo -e "\033[33mUpdating venv reqs in $SCRIPT_DIR/requirements.txt\033[0m"
-    pip install --upgrade -r "$SCRIPT_DIR/requirements.txt"
-else
-    echo -e "\033[33mInsuring libpq-dev python3-dev are installed for psycopg2 dep\033[0m"
-    echo "(Using sudo, so you will need to supply a password)"
-    sudo apt-get update -y && sudo apt-get install -y libpq-dev python3-dev
-    echo -e "\033[33mSetting up virtualenv in venv\033[0m"
-    echo "IMPORTANT: Setting up for Python3!"
-    echo "IMPORTANT: Not using site-packages - keep this in mind if you add scipy"
-    virtualenv -p python3 venv
-    source $SCRIPT_DIR/venv/bin/activate
-    echo -e "\033[33mInstalling reqs in $SCRIPT_DIR/requirements.txt\033[0m"
-    pip install --upgrade pip wheel setuptools
-    pip install --upgrade -r "$SCRIPT_DIR/requirements.txt"
-fi
+set -e
+
+pipenv --three
+pipenv install
+
 
 echo -e "\033[33mLook for config\033[0m"
 
@@ -30,7 +18,7 @@ AUTO_CFG="$SCRIPT_DIR/current.config"
 if [ "" == "$NBMN_CONFIG" ]; then
     if [ -f "$AUTO_CFG" ]; then
         echo "NBNM_CONFIG not defined, but found $AUTO_CFG"
-        echo "Check that file for your configuration when running ./run or ./tool"
+        echo "Check that file for your configuration when running ./run or ./tools"
     else
         echo -e "\033[31mNOTE! NBMN_CONFIG is not defined and $AUTO_CFG does not exist\033[0m"
         echo "Only the default values in $SCRIPT_DIR/default.config will be used"
