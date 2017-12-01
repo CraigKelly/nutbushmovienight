@@ -23,4 +23,5 @@ if [ "" == "$NBMN_CONFIG" ]; then
     fi
 fi
 
+PATH="${SCRIPT_DIR}/../.local/bin:${PATH}"
 pipenv run python $SCRIPT_DIR/main.py
