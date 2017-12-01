@@ -105,7 +105,7 @@ def main():
     HOST = 'localhost'
     PORT = '10081'
 
-    log.info("About to start serving deployment hook on %s:%d", HOST, PORT)
+    log.info("About to start serving deployment hook on %s:%s", HOST, PORT)
     from waitress import serve
     serve(app, host=HOST, port=PORT)
 
