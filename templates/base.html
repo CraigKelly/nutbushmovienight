@@ -20,8 +20,8 @@
 <link href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.dataTables.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css" rel="stylesheet">
 
-<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/redmond/jquery-ui.css" rel="stylesheet" />
-<link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css" rel="stylesheet">
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/redmond/jquery-ui.css" rel="stylesheet" />
+<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css" rel="stylesheet">
 
 <link rel="stylesheet" href="/static/nutbush.css" type="text/css">
 </head>
@@ -309,10 +309,8 @@
                 return newEle;
             }
 
-            img = _.prop(movie_data, "Poster");
-            if (!!img) {
-                $("#moviedlg-movieimg").attr("src", img);
-            }
+            console.log(all_data);
+            $("#moviedlg-movieimg").attr("src", all_data.Poster);
 
             addOne('Director');
             addOne('Writer');

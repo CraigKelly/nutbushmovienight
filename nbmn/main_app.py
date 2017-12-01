@@ -2,9 +2,12 @@
 
 # pylama:ignore=E501,D213
 
+from io import BytesIO
 from os.path import isfile
 from datetime import datetime
 from operator import attrgetter
+
+import requests
 
 from flask import (
     abort,
@@ -15,6 +18,7 @@ from flask import (
     jsonify,
     redirect,
     request,
+    send_file,
     url_for
 )
 
@@ -23,6 +27,7 @@ from .log import app_logger
 from .auth import NotAuthorized, require_login
 from .utils import logged_errors, template, templated, use_error_page, project_file
 from .model import User, Movie, Night, Attendee, MovieOverride
+from .remote import create_omdb_poster_get
 from .slack import notify
 
 main = Blueprint('main', __name__)
@@ -34,20 +39,19 @@ main = Blueprint('main', __name__)
 def main_page():
     """Default page for app."""
     MAX_NIGHTS = 12
+
     nights = Night.find_by_index('index_year', datetime.now().year)
     if len(nights) < MAX_NIGHTS:
         nights.extend(Night.find_by_index('index_year', datetime.now().year - 1))
+
     nights.sort(key=attrgetter('datestr'), reverse=True)
+    nights = nights[:MAX_NIGHTS]
 
     for night in nights:
-        thumb = None
-        movie = Movie.find_by_imdb(night.imdbid)
-        if movie and movie.extdata:
-            thumb = movie.extdata.get('omdb', {}).get('Poster', '')
-        night.thumb = thumb or "/static/default_movie_thumb.png"
+        night.thumb = url_for('main.movie_image', imdbkey=night.imdbid)
 
     return {
-        'movienights': nights[:MAX_NIGHTS]
+        'movienights': nights
     }
 
 
@@ -61,11 +65,12 @@ def movie_display(moviekey=None):
         if not movie:
             return None
         movie.urlname = movie.imdbid
+        movie.poster = url_for('main.movie_image', imdbkey=movie.imdbid)
         return movie
 
     if moviekey:
-        movie = Movie.find_by_imdb(moviekey)
-        return {'movie': fixup(movie), 'movie_name': movie.name or '???'}
+        movie = fixup(Movie.find_by_imdb(moviekey))
+        return {'movie': movie, 'movie_name': movie.name or '???'}
     else:
         movies = [fixup(m) for m in Movie.find_all()]
         movies.sort(key=attrgetter('name'))
@@ -79,7 +84,52 @@ def movie_data(imdbkey):
     movie = Movie.find_by_imdb(imdbkey)
     if not movie:
         abort(404)
+    movie.extdata['Poster'] = url_for('main.movie_image', imdbkey=movie.imdbid)
     return jsonify(**movie.extdata)
+
+
+@main.route('/movieimage/<imdbkey>')
+@logged_errors
+def movie_image(imdbkey):
+    """Movie image retrieval via remote API."""
+    movie = Movie.find_by_imdb(imdbkey)
+    if not movie:
+        abort(404)
+
+    local_path = project_file('static/posters/%s.jpg' % movie.imdbid)
+    if isfile(local_path):
+        buffer_image = open(local_path, "rb")
+        mimetype = 'image/jpeg'
+        imgsrc = 'Local Disk (%s)' % local_path
+    else:
+        r = create_omdb_poster_get(imdbkey)
+        if r.status_code == 200:
+            buffer_image = BytesIO(r.content)
+            buffer_image.seek(0)
+            mimetype = r.headers['Content-Type']
+            imgsrc = 'OMDB Poster API'
+        else:
+            app_logger().warn('Poster API %s found nothing (%s)', movie.imdbid, str(r.status_code))
+            poster = movie.extdata.get('omdb', {}).get('Poster', '')
+            r = None
+            if poster:
+                r = requests.get(poster)
+
+            if r and r.status_code == 200:
+                buffer_image = BytesIO(r.content)
+                buffer_image.seek(0)
+                mimetype = r.headers['Content-Type']
+                imgsrc = 'OMDB Post Link in Data'
+            else:
+                app_logger().warn('No Poster Link in data for %s', movie.imdbid)
+                local_path = project_file('static/default_movie_thumb.png')
+                buffer_image = open(local_path, 'rb')
+                mimetype = 'image/png'
+                imgsrc = 'Default Poster (%s)' % local_path
+
+    app_logger().info('Send image for %s from %s', movie.imdbid, imgsrc)
+
+    return send_file(buffer_image, mimetype=mimetype)
 
 
 @main.route('/badmovie/<imdbkey>')

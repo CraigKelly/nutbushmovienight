@@ -4,8 +4,6 @@ Once upon a time we used Rotten Tomatoes and their IMDB lookup. Since they no
 longer allow free data access we have completely migrated to the Open Movie
 DB at omdbapi.com (they accept donations if you are so inclined.)
 
-One day we plan on switching to their Poster API as donors.
-
 Any format described below as 'date' is in the format "%d %b %Y" and
 assumes en_US locale
 
@@ -101,6 +99,22 @@ def create_omdb_get(omdb_id, base="http://www.omdbapi.com/"):
     })
 
 
+def create_omdb_poster_get(omdb_id, base="http://img.omdbapi.com/"):
+    """Return a requests GET for OMDB API."""
+    apikey = current_app.config.get("OMDB_API_KEY", "").strip()
+    if not apikey:
+        raise ValueError("No OMDB API Key supplied in configuration!")
+
+    omdb_id = norm_imdbid(omdb_id)
+    if not omdb_id:
+        return None
+
+    return requests.get(base, params={
+        'apikey':   apikey,
+        'i':        omdb_id
+    })
+
+
 # Simple mapper from omdbapi.com to the format we expect from rot tom
 # in imdb format
 def _omdb_get(omdb_id):
@@ -135,6 +149,11 @@ def _norm_omdb_resp(src):
             else:
                 v = v.split(',')
         resp[k] = v
+
+    # Look for Poster
+    poster = str(resp.get('Poster', '')).strip()
+    if not poster or poster.upper() == "N/A":
+        poster = ""
 
     # Best effort on numbers
     NUMERICS = [

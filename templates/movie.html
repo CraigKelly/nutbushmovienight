@@ -19,7 +19,7 @@
             <div class="col-md-8" id="movie-details-container">
             </div>
             <div class="col-md-4">
-                <img id="det-movieimg" src="" alt="{{movie.name}}" class="img-responsive img-thumbnail"/>
+                <img id="det-movieimg" alt="{{movie.name}}" class="img-responsive img-thumbnail" src="{{url_for('main.movie_image', imdbkey=movie.imdbid)}}"/>
             </div>
         </div>
         <div class="row">
@@ -97,11 +97,6 @@ data.movie_by_imdb(imdbid, function(all_data, textStatus) {
 
         $(target).append(newEle);
         return newEle;
-    }
-
-    img = _.prop(movie_data, "Poster");
-    if (!!img) {
-        $("#det-movieimg").attr("src", img);
     }
 
     addOne('Director');
