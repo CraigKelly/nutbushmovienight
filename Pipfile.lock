@@ -1,23 +1,25 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e1a27328a8a58ff224cecfde926858dd15ef96448d3a9203036b143eb73b0435"
+            "sha256": "3db1e9a0c040aed4420892a2d4f891066e357b21c007287984fd9648be62e91f"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
-            "implementation_version": "3.6.1",
+            "implementation_version": "3.6.3",
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "4.4.0-101-generic",
+            "platform_release": "4.10.0-40-generic",
             "platform_system": "Linux",
-            "platform_version": "#124-Ubuntu SMP Fri Nov 10 18:29:59 UTC 2017",
-            "python_full_version": "3.6.1",
+            "platform_version": "#44-Ubuntu SMP Thu Nov 9 14:49:09 UTC 2017",
+            "python_full_version": "3.6.3",
             "python_version": "3.6",
             "sys_platform": "linux"
         },
         "pipfile-spec": 6,
-        "requires": {},
+        "requires": {
+            "python_version": "3.6"
+        },
         "sources": [
             {
                 "name": "pypi",
@@ -71,8 +73,7 @@
         },
         "gludb": {
             "editable": true,
-            "git": "https://github.com/memphis-iis/GLUDB",
-            "ref": "25692528ff6fe8184a3570f61f31f1a90088a388"
+            "git": "https://github.com/memphis-iis/GLUDB"
         },
         "idna": {
             "hashes": [
