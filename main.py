@@ -10,7 +10,7 @@ setup.
 
 # pylama:ignore=E501,D212
 
-# TODO; make sure our set up works even without pyenv
+# TODO; switch to pipenv (will require server setup)
 
 # TODO: see about using daiquiri for logging: be sure to log at tools
 
