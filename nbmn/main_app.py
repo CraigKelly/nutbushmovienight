@@ -172,6 +172,16 @@ def person_display(name=None):
         # Don't fixup attendees for the list
         person_name = 'Listing Them All!'
         persons = Attendee.find_all()
+
+        for p in persons:
+            p.nights = []
+        for n in Night.find_all():
+            for p in persons:
+                if n.has_attendee(p.name):
+                    p.nights.append(n)
+
+        for p in persons:
+            p.nights.sort(key=attrgetter('datestr'), reverse=True)
         Attendee.sort(persons)
 
     return {
