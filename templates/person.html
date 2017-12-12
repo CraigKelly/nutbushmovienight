@@ -51,8 +51,8 @@
                     <tr>
                         <td><a href="{{url_for('main.person_display', name=per.urlname)}}">{{per.name}}</a></td>
                         {% if per.nights %}
-                            <td>{{person.nights|length}}</td>
-                            <td><a href="{{url_for('main.night_display', datestr=person.nights[0].datestr)}}">{{person.nights[0].listdate}}</a></td>
+                            <td>{{per.nights|length}}</td>
+                            <td><a href="{{url_for('main.night_display', datestr=per.nights[0].datestr)}}">{{per.nights[0].listdate}}</a></td>
                         {% else %}
                             <td>&nbsp;</td>
                             <td>&nbsp;</td>

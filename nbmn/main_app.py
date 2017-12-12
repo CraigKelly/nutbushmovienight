@@ -55,6 +55,14 @@ def main_page():
     }
 
 
+@main.route('/debuglogin')
+@require_login
+@use_error_page
+def debug_login():
+    """Just a simple page to trigger a login, which is handy for the DEBUG_LOGIN env var."""
+    return main_page()
+
+
 @main.route('/movie')
 @main.route('/movie/<moviekey>')
 @templated("movie.html")

@@ -1,5 +1,6 @@
 """Authentication Flask Blueprint for login functionality in our app."""
 
+import os
 import sys
 import traceback
 
@@ -48,11 +49,33 @@ def require_login(func):
     @wraps(func)
     def wrapper(*args, **kwrds):
         try:
+            # DEBUG login set in env
+            debug_email = os.environ.get('DEBUG_EMAIL', '')
+            if debug_email:
+                # we have a manual user login
+                users = User.find_by_index('index_email', debug_email)
+                if users:
+                    user = users[0]  # Always first found
+                else:
+                    user = User(email=debug_email)
+                user.name = ' '.join(debug_email.split('@')[0].split('.')).title()
+                user.photo = '/static/anonymous_person.png'
+                user.utype = 'admin'
+                user.logins.append(now_field())
+                user.save()
+                User.set_user_session(user.id)
+                app_logger().warn("Logged in DEBUG user id %s, email %s" % (user.id, user.email))
+                flash("You are logged in as " + user.name, category='info')
+                setattr(g, 'user', user)
+                return func(*args, **kwrds)
+
+            # Normal login
             user = User.get_user()
             if user:
                 setattr(g, 'user', user)
                 return func(*args, **kwrds)
             else:
+                # Proceed with auto login as per usual
                 url = url_for('auth.login', redir=request.url)
                 return redirect(url)
         except:
