@@ -10,6 +10,8 @@ setup.
 
 # pylama:ignore=E501,D212
 
+# TODO: switch from DataTables to FooTable (http://fooplugins.github.io/FooTable/docs/getting-started.html)
+
 # TODO: see about using daiquiri for logging: be sure to log at tools
 
 # TODO: allow link selection from nbmn flickr account...
