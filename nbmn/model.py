@@ -317,7 +317,7 @@ class Night(object):
     @property
     def listdate_js(self):
         """Displayable date guaranteed to be JS-parseable."""
-        return self.date_from_str(self.datestr).strftime("%Y/%m/%d")
+        return self.date_from_str(self.datestr).strftime("%a, %d %b %Y")
 
     @property
     def comment_disp(self):
