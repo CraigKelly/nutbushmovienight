@@ -10,7 +10,12 @@ setup.
 
 # pylama:ignore=E501,D212
 
-# TODO: switch from DataTables to FooTable (http://fooplugins.github.io/FooTable/docs/getting-started.html)
+# TODO: was going to switch from DataTables to FooTable, but you know what?
+#       Screw that - just implement our own. Need to include:
+#        - Paging with row count display options
+#        - Filtering
+#        - Auto sorting
+#       Code will assume bootstrap, jquery, and lodash
 
 # TODO: see about using daiquiri for logging: be sure to log at tools
 
