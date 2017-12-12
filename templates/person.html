@@ -23,7 +23,7 @@
         <tbody>
         {% for mn in person.nights %}
             <tr>
-                <td class="nw"><a href="{{url_for('main.night_display', datestr=mn.datestr)}}">{{mn.listdate_short}}</a></td>
+                <td class="nw"><a href="{{url_for('main.night_display', datestr=mn.datestr)}}">{{mn.listdate_js}}</a></td>
                 <td><a class="movie-auto-click" data-imdbid="{{mn.imdbid}}" href="{{url_for('main.movie_display', moviekey=mn.imdbid)}}">{{mn.moviename}}</a></td>
                 <td>{{mn.dinner}}</td>
             </tr>
@@ -73,21 +73,15 @@
 $('#personnights').dataTable({
     "bPaginate": false,
     "aaSorting": [[ 0, "desc" ]],
-    "aoColumns": [
-        { "sType": "date" },
-        null,
-        null
-    ],
     responsive: true
 });
 
 $('#allpeople').dataTable({
     "bPaginate": false,
     "aaSorting": [[ 1, "desc" ]],
-    "aoColumns": [
-        { "sType": "string" },
-        { "sType": "numeric" },
-        null
+    "columnDefs": [
+        { "targets": 0, "type": "string" },
+        { "targets": 1, "type": "numeric" },
     ],
     responsive: true
 });
