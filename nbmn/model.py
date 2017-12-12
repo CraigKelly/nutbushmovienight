@@ -316,8 +316,8 @@ class Night(object):
 
     @property
     def listdate_js(self):
-        """Displayable date guaranteed to be JS-parseable."""
-        return self.date_from_str(self.datestr).strftime("%a, %d %b %Y")
+        """Displayable date that we know correctly sorts with JS-based date tables."""
+        return self.date_from_str(self.datestr).strftime("%Y-%m-%d (%a, %b %d)")
 
     @property
     def comment_disp(self):
