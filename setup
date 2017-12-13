@@ -8,7 +8,6 @@ echo "This will required pipenv to already be installed!"
 
 set -e
 
-pipenv --python 3.6.1
 pipenv install
 
 
