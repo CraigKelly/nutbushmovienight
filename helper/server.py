@@ -8,7 +8,11 @@ import os
 import os.path as pth
 import subprocess
 import logging
+
+import daiquiri
+
 from flask import Flask, request, jsonify
+
 
 # Create app and handle configuration
 app = Flask(__name__)
@@ -18,8 +22,8 @@ app.secret_key = app.config.get('FLASK_SECRET', None)
 
 # Handle debug flag from config file - and let them use anything truthy to
 # our DEBUG flag
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger("deploy")
+daiquiri.setup(level=logging.DEBUG)
+log = daiquiri.getLogger("deploy")
 
 log.info('Application Deployment logging begin')
 

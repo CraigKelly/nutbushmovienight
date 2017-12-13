@@ -205,11 +205,15 @@ def alternate_copy(glu_database, log_file):
     """Copy all data to the alternate gludb database location."""
     print("Configuring logging to use %s" % log_file)
     import logging
-    logging.basicConfig(level=logging.DEBUG, filename=log_file)
-    stdout_handler = logging.StreamHandler()
-    stdout_handler.setLevel(logging.WARN)
-    log = logging.getLogger()
-    log.addHandler(stdout_handler)
+    import daiquiri
+    daiquiri.setup(
+        level=logging.DEBUG,
+        outputs=(
+            daiquiri.output.File(log_file, level=logging.DEBUG),
+            daiquiri.output.Stream(sys.stdout, level=logging.WARN),
+        )
+    )
+    log = daiquiri.getLogger('nbmn-tools')
 
     class_database(AttendeeOutput, glu_database)
     class_database(MovieOutput, glu_database)

@@ -17,8 +17,6 @@ setup.
 #        - Auto sorting
 #       Code will assume bootstrap, jquery, and lodash
 
-# TODO: see about using daiquiri for logging: be sure to log at tools
-
 # TODO: allow link selection from nbmn flickr account...
 # We would get the images using a call to flickr.people.getPublicPhotos for 65666367@N06
 # (see https://www.flickr.com/services/api/explore/flickr.people.getPublicPhotos)
@@ -41,7 +39,8 @@ from flask import Flask, g
 
 from gludb.config import default_database, Database
 
-from nbmn.log import app_logger
+import nbmn.log as log
+
 from nbmn.model import User, Movie, Night, Attendee, MovieOverride
 from nbmn.auth import auth
 from nbmn.main_app import main
@@ -59,15 +58,14 @@ app.secret_key = app.config.get('FLASK_SECRET', None)
 app.debug = True if app.config.get('DEBUG', None) else False
 
 # Set up logging
-LOG_LEVEL = logging.DEBUG if app.debug else logging.INFO
-logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s %(message)s')
-app_logger().info('Application logging begin: debug==%s', app.debug)
+log.setup(level=logging.DEBUG if app.debug else logging.INFO)
+log.app_logger().info('Application logging begin: debug==%s', app.debug)
 
 # They can specify that certain config variables are copied in to
 # the system environment
 for name in app.config.get("ENV_POPULATE"):
     val = str(app.config.get(name))
-    app_logger().info('Setting env[%s]=%s' % (name, val))
+    log.app_logger().info('Setting env[%s]=%s' % (name, val))
     os.environ[name] = val
 
 # Now that we're all set up, we can register our blueprints
@@ -92,12 +90,12 @@ def database_config():
 
     # We actually monkey-patch and log saves to the database if required
     if app.config["LOG_SAVES"]:
-        app_logger().info("Monkey-patching gludb to log object saves")
+        log.app_logger().info("Monkey-patching gludb to log object saves")
         Database._old_save = Database.save
 
         def logged_save(self, obj):
             self._old_save(obj)
-            app_logger().info("%s[id=%s] Saved:%s", obj.get_table_name(), obj.get_id(), obj.to_data())
+            log.app_logger().info("%s[id=%s] Saved:%s", obj.get_table_name(), obj.get_id(), obj.to_data())
 
         Database.save = logged_save
 
@@ -138,7 +136,7 @@ def main():
 
     database_config()
 
-    app_logger().info("About to start serving on %s:%d", HOST or "[ALL IFaces]", PORT)
+    log.app_logger().info("About to start serving on %s:%d", HOST or "[ALL IFaces]", PORT)
     from waitress import serve
     serve(app, host=HOST, port=PORT)
 

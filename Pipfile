@@ -4,14 +4,17 @@ verify_ssl = true
 url = "https://pypi.python.org/simple"
 name = "pypi"
 
+
 [requires]
 
 python_version = "3.6"
+python_full_version = "3.6.3"
 
 
 [dev-packages]
 
 nose = "*"
+
 
 [packages]
 
@@ -23,3 +26,4 @@ gludb = {editable = true, git = "https://github.com/memphis-iis/GLUDB"}
 pymongo = "*"
 requests = "*"
 waitress = "*"
+daiquiri = "*"
