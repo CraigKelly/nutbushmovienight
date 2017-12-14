@@ -73,6 +73,16 @@ def atom_nights():
     return feed.get_response()
 
 
+def _line_folder(src):
+    """Handle line folding and termination for iCalendar."""
+    for line in src:
+        while len(line) > 75:
+            chunk, line = line[:73], line[73:]
+            yield chunk + '\r\n\t'
+        if line:
+            yield line + '\r\n'
+
+
 @data.route('/calendar')
 def calendar():
     cal_lines = [
@@ -82,24 +92,21 @@ def calendar():
     ]
 
     for night in Night.find_all():
-        cal_lines.extend([
+        one = [
             'BEGIN:VEVENT',
             'UID:{}.{}@nutbushmovienight.com'.format(night.datestr, night.id),
             'DTSTAMP:' + night.listdate_ical,
             'DTSTART:' + night.dstamp_ical,
             'SUMMARY:{} ({})'.format(night.listdate_short, night.moviename)
-        ])
-        cal_lines.extend(['ATTENDEE:' + a for a in night.attendees])
-        cal_lines.append('END:VEVENT')
+        ]
+        one.extend(['ATTENDEE:' + a for a in night.attendees])
+        one.append('END:VEVENT')
+
+        cal_lines.extend(one)
 
     cal_lines.append('END:VCALENDAR')
 
-    for i, line in enumerate(cal_lines):
-        if len(line) > 75:
-            app_logger.warn('Trimming calendar line %i (> 75): %s', i, line)
-            cal_lines[i] = line[:75]
-
-    resp = make_response('\r\n'.join(cal_lines))
+    resp = make_response(''.join(_line_folder(cal_lines)))
     resp.mimetype = 'text/calendar'
     resp.headers['Content-Disposition'] = 'attachment; filename=calendar.ics'
 
