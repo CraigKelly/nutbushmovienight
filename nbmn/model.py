@@ -333,7 +333,7 @@ class Night(object):
             dt = parse_now_field(ndt)
         else:
             dt = datetime.now()
-        return self.date_from_str(self.datestr).strftime("%Y%m%dT%H%M%SZ")
+        return self.date_from_str(dt).strftime("%Y%m%dT%H%M%SZ")
 
     @property
     def comment_disp(self):

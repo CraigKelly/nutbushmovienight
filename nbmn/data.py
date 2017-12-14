@@ -95,8 +95,8 @@ def calendar():
         one = [
             'BEGIN:VEVENT',
             'UID:{}.{}@nutbushmovienight.com'.format(night.datestr, night.id),
-            'DTSTAMP:' + night.listdate_ical,
-            'DTSTART:' + night.dstamp_ical,
+            'DTSTAMP:' + night.dstamp_ical,
+            'DTSTART:' + night.listdate_ical,
             'SUMMARY:{} ({})'.format(night.listdate_short, night.moviename)
         ]
         one.extend(['ATTENDEE:' + a for a in night.attendees])
