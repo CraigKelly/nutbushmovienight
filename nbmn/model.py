@@ -9,6 +9,7 @@ import random
 from datetime import datetime
 
 from gludb.simple import DBObject, Field, Index
+from gludb.utils import parse_now_field
 from flask import session, current_app
 
 from .log import app_logger
@@ -318,6 +319,21 @@ class Night(object):
     def listdate_js(self):
         """Displayable date that we know correctly sorts with JS-based date tables."""
         return self.date_from_str(self.datestr).strftime("%Y-%m-%d (%a, %b %d)")
+
+    @property
+    def listdate_ical(self):
+        """Return string version of a date compatible with iCalendar DTSTART etc."""
+        return self.date_from_str(self.datestr).strftime("%Y%m%dT183000Z")
+
+    @property
+    def dstamp_ical(self):
+        """Return string compatible with iCal DTSTAMP."""
+        ndt = getattr(self, '_last_update', None) or getattr(self, '_create_date', None)
+        if ndt:
+            dt = parse_now_field(ndt)
+        else:
+            dt = datetime.now()
+        return self.date_from_str(self.datestr).strftime("%Y%m%dT%H%M%SZ")
 
     @property
     def comment_disp(self):

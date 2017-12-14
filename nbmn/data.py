@@ -6,10 +6,11 @@ import json
 
 from operator import attrgetter
 
-from flask import Blueprint, jsonify, render_template, request, url_for
+from flask import Blueprint, jsonify, make_response, render_template, request, url_for
 
 import werkzeug.contrib.atom as atom
 
+from .log import app_logger
 from .utils import templated, use_error_page
 from .model import Night, Movie, Attendee
 
@@ -70,3 +71,36 @@ def atom_nights():
         )
     
     return feed.get_response()
+
+
+@data.route('/calendar')
+def calendar():
+    cal_lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Wondrous Oligarchs of Nutbush//NONSGML nutbushmovienight.com//EN'
+    ]
+
+    for night in Night.find_all():
+        cal_lines.extend([
+            'BEGIN:VEVENT',
+            'UID:{}.{}@nutbushmovienight.com'.format(night.datestr, night.id),
+            'DTSTAMP:' + night.listdate_ical,
+            'DTSTART:' + night.dstamp_ical,
+            'SUMMARY:{} ({})'.format(night.listdate_short, night.moviename)
+        ])
+        cal_lines.extend(['ATTENDEE:' + a for a in night.attendees])
+        cal_lines.append('END:VEVENT')
+
+    cal_lines.append('END:VCALENDAR')
+
+    for i, line in enumerate(cal_lines):
+        if len(line) > 75:
+            app_logger.warn('Trimming calendar line %i (> 75): %s', i, line)
+            cal_lines[i] = line[:75]
+
+    resp = make_response('\r\n'.join(cal_lines))
+    resp.mimetype = 'text/calendar'
+    resp.headers['Content-Disposition'] = 'attachment; filename=calendar.ics'
+
+    return resp
