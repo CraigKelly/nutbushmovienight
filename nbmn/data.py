@@ -82,6 +82,9 @@ def _line_folder(src):
         if line:
             yield line + '\r\n'
 
+def _ical_attendee(att):
+    """Given one of our attendee's, return an iCal comptible string usable by Google Calendar."""
+    return 'ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN={n:s};X-NUM-GUESTS=0:mailto:{em:s}@nutbushmovienight.com'.format(n=att.title(), em=att.lower())
 
 @data.route('/calendar')
 def calendar():
@@ -99,7 +102,7 @@ def calendar():
             'DTSTART:' + night.listdate_ical,
             'SUMMARY:{} ({})'.format(night.moviename, night.dinner)
         ]
-        one.extend(['ATTENDEE:' + a for a in night.attendees])
+        one.extend([_ical_attendee(a) for a in night.attendees])
         one.append('END:VEVENT')
 
         cal_lines.extend(one)
