@@ -10,6 +10,9 @@ setup.
 
 # pylama:ignore=E501,D212
 
+# TODO: add Atom feed
+# TODO: add CalDAV feed
+
 # TODO: was going to switch from DataTables to FooTable, but you know what?
 #       Screw that - just implement our own. Need to include:
 #        - Paging with row count display options

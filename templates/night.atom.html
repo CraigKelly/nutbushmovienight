@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="application-name" content="Nutbush Movie Night Web App">
+<meta name="keywords" content="movie,food,dinner,nutbush,memphis,awesome">
+<meta name="description" content="A web site for a very special weekly occurrence">
+<meta name="subject" content="Movies and food">
+
+<title>{{night_title}}</title>
+
+<link type="text/plain" rel="author" href="{{SITEURL}}/humans.txt" />
+
+<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/nutbush.css" type="text/css">
+
+</head>
+
+<body>
+
+<div class="container" style="padding-left:4%;">
+    <!-- Header -->
+    <div class="row">
+        <div class="page-header">
+            <h1>{{night_title}}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Meal</h4>
+            <p>
+                <a href="{{url_for('main.night_display', datestr=night.datestr)}}">{{night.dinner}}</a>
+            </p>
+
+            <h4>Movie</h4>
+            <p>
+                <a href="{{url_for('main.movie_display', moviekey=night.imdbid)}}">{{night.moviename}}</a>
+            </p>
+            
+            <h4>Attending</h4>
+            <ul class="list-unstyled">
+            {% for attendee in night.attendees %}
+                <li><a href="{{url_for('main.person_display', name=attendee)}}">{{attendee}}</a></li>
+            {% endfor %}
+            </ul>
+            
+            {% if night.comment_disp %}
+            <div class="well">
+                {% autoescape false %}
+                {{night.comment_disp|safe}}
+                {% endautoescape %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
