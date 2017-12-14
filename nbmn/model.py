@@ -323,7 +323,7 @@ class Night(object):
     @property
     def listdate_ical(self):
         """Return string version of a date compatible with iCalendar DTSTART etc."""
-        return self.date_from_str(self.datestr).strftime("%Y%m%dT183000Z")
+        return self.date_from_str(self.datestr).strftime("%Y%m%dT233000Z")
 
     @property
     def dstamp_ical(self):
