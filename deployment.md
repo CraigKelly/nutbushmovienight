@@ -1,12 +1,26 @@
 # New Deployment Plan
 
-Currently, we assume a working dir already set up with pyenv/pipenv to match our
-Pipfile. Lots of this manual work needs to be replaced with a better run script...
+Currently, we assume a working dir already set up with pyenv/pipenv to match
+our Pipfile. Lots of this manual work needs to be replaced with a better run
+script...
 
-To set up a new server, we need to build a decently recent Python 3.6 (note that
-once this is happening, we'll remove the detailed Python dep in the Pipfile).
-Note that we also assume the presence of a script named `dev-up` that prepares
-the workstation for Python builds.
+## Plan
+
+See details below, but basically:
+
+1. Update the `run` script to match below
+1. Update everything in the `helper` dir to match below
+1. Update production to test all of this out
+1. Update this doc to be actual instructions (including info currently in
+   README.md) instead of a planning doc
+1. Update README.md to point to this doc for deployment/running help
+
+## Details
+
+To set up a new server, we need to build a decently recent Python 3.6 (note
+that once this is happening, we'll remove the detailed Python dep in the
+Pipfile).  Note that we also assume the presence of a script named `dev-up`
+that prepares the workstation for Python builds.
 
 ```
 $ dev-up
@@ -17,8 +31,8 @@ $ ./configure --prefix=/opt/py --enable-optimizations
 $ sudo make install
 ```
 
-We are assuming that we already have a `www-data` user. However, we want a special
-home directory for this app and that user:
+We are assuming that we already have a `www-data` user. However, we want a
+special home directory for this app and that user:
 
 ```
 $ cd /opt
@@ -26,8 +40,8 @@ $ sudo mkdir www-data-home
 $ sudo chown www-data:www-data www-data-home/
 ```
 
-At this point, we should be able to run a script that insures the latest Pipfile
-deps and then uses `./run`:
+At this point, we should be able to run a script that insures the latest
+Pipfile deps and then uses `./run`:
 
 ```
 #!/bin/bash
