@@ -5,8 +5,11 @@ Pipfile. Lots of this manual work needs to be replaced with a better run script.
 
 To set up a new server, we need to build a decently recent Python 3.6 (note that
 once this is happening, we'll remove the detailed Python dep in the Pipfile).
+Note that we also assume the presence of a script named `dev-up` that prepares
+the workstation for Python builds.
 
 ```
+$ dev-up
 $ wget Python-3.6.awesome.tgz
 $ tar -zxf Python-3.6.awesome.tgz
 $ cd Python-3.6.awesome.tgz
