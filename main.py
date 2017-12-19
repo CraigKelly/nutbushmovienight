@@ -10,6 +10,8 @@ setup.
 
 # pylama:ignore=E501,D212
 
+# TODO: see deployment.md - need to switch our server deployment
+
 # TODO: was going to switch from DataTables to FooTable, but you know what?
 #       Screw that - just implement our own. Need to include:
 #        - Paging with row count display options
