@@ -318,9 +318,11 @@ def main():
     """Entry point."""
     args = sys.argv[1:]
     if len(args) < 1:
-        return usage('No command specified')
+        print('No command specified: showing help')
+        cmd, opts = 'help', []
+    else:
+        cmd, opts = args[0], args[1:]
 
-    cmd, opts = args[0], args[1:]
     cmd_func, need_db = COMMANDS.get(cmd, (None, None))
     if not cmd_func:
         return usage('Unknown cmd ' + cmd)
