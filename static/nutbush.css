@@ -57,3 +57,8 @@
     border-style: solid;
     padding-left: 0.5em;
 }
+
+/* Generic movie display dialog - we override by ID to handle jQuery weirdness */
+#movie-dialog {
+    font-family: "Roboto","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
