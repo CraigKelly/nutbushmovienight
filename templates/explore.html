@@ -74,7 +74,7 @@
             </div>
             <div class="panel-body">
                 <a href="#" class="movie-auto-click" data-imdbid="<%= movie.imdbid%>">
-                    <img src="<%= _.prop(omdb, 'Poster')%>" class="img-responsive img-thumbnail img-movie-thumbnail pull-left" style="margin-right:1rem;">
+                    <img src="<%= _.prop(movie.extdata, 'Poster')%>" class="img-responsive img-thumbnail img-movie-thumbnail pull-left" style="margin-right:1rem;">
                 </a>
 
                 <a href="#" class="movie-auto-click" data-imdbid="<%= movie.imdbid%>">

@@ -10,7 +10,6 @@ from flask import Blueprint, jsonify, make_response, render_template, request, u
 
 import werkzeug.contrib.atom as atom
 
-from .log import app_logger
 from .utils import templated, use_error_page
 from .model import Night, Movie, Attendee
 
@@ -22,18 +21,24 @@ def _to_dict(obj):
     return json.loads(obj.to_data())
 
 
+def _movie_dict(movie):
+    d = _to_dict(movie)
+    d['extdata']['Poster'] = url_for('main.movie_image', imdbkey=movie.imdbid)
+    return d
+
+
 @data.route('/gimme')
 def data_dump():
     """Return all night/movie data in JSON format for client-side analysis."""
     return jsonify({
         'attendees': [_to_dict(a) for a in Attendee.find_all()],
         'nights': [_to_dict(n) for n in Night.find_all()],
-        'movies': dict([(m.imdbid, _to_dict(m)) for m in Movie.find_all()]),
+        'movies': dict([(m.imdbid, _movie_dict(m)) for m in Movie.find_all()]),
     })
 
 
 @data.route('/explore')
-@templated("explore.html")
+@templated('explore.html')
 @use_error_page
 def explore_data():
     """Our data exploration and search page."""
@@ -47,11 +52,11 @@ def atom_nights():
         title_type='text',
         subtitle='All Movie Nights',
         author=sorted(Attendee.OLIGARCHS),
-        feed_url=request.url, 
+        feed_url=request.url,
         url=request.url_root,
         logo=url_for('static', filename='logo.png'),
     )
-    
+
     nights = Night.find_all()
     nights.sort(key=attrgetter('datestr'), reverse=True)
 
@@ -69,7 +74,7 @@ def atom_nights():
             updated=dt,
             published=dt
         )
-    
+
     return feed.get_response()
 
 
@@ -82,9 +87,11 @@ def _line_folder(src):
         if line:
             yield line + '\r\n'
 
+
 def _ical_attendee(att):
     """Given one of our attendee's, return an iCal comptible string usable by Google Calendar."""
     return 'ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN={n:s};X-NUM-GUESTS=0:mailto:{em:s}@nutbushmovienight.com'.format(n=att.title(), em=att.lower())
+
 
 @data.route('/calendar')
 def calendar():
