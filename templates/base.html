@@ -159,7 +159,7 @@
             <div class="row">
                 {% for mn in movienights %}
                     <div class="col-md-6">
-                    <div class="panel panel-primary">
+                    <div class="panel panel-primary" data-ccsi="{{mn.ccsi}}">
                         <div class="panel-heading">
                             <div class="panel-title">
                                 <a href="{{url_for('main.night_display', datestr=mn.datestr)}}">

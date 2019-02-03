@@ -9,6 +9,7 @@ python_version = "3.6"
 [dev-packages]
 nose = "*"
 pylint = "*"
+pep8 = "*"
 
 [packages]
 flask = ">=0.12.3"

@@ -283,6 +283,7 @@ def night_save(datestr):
     night.imdbid = request.form.get('movieimdbid', '')
     night.dinner = request.form.get('moviemeal', '')
     night.comments = request.form.get('moviecomments', '')
+    night.ccsi = request.form.get('movieccsi', 0)
 
     # Handle attendees
     attendees = set([
@@ -324,6 +325,7 @@ def validate_night(night):
         yield "Need at least 2 attendees"
     if not night.moviename:
         yield "Please enter *something* for the movie name"
+    # TODO: might want to validate that ccsi is a number here
 
 
 def do_night_edit(night, mode):

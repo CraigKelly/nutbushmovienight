@@ -241,6 +241,7 @@ class Night(object):
     dinner = Field('')
     comments = Field('')
     attendees = Field(list)
+    ccsi = Field(0)
 
     DATE_FMT = "%Y%m%d"
 
@@ -252,6 +253,13 @@ class Night(object):
         """Provide a method to insure all the fields are correct."""
         self.datestr = self.str_from_date(self.datestr)
         self.imdbid = norm_imdbid(self.imdbid)
+        try:
+            if self.ccsi:
+                self.ccsi = int(self.ccsi)
+            else:
+                self.ccsi = 0  # '', [], etc becomes 0
+        except:
+            pass  # Just allow non-int field for now
 
     @Index
     def index_datestr(self):
@@ -317,12 +325,12 @@ class Night(object):
 
     @property
     def listdate_js(self):
-        """Displayable date that we know correctly sorts with JS-based date tables."""
+        """Displayable date that sorts correctly with JS-based date tables."""
         return self.date_from_str(self.datestr).strftime("%Y-%m-%d (%a, %b %d)")
 
     @property
     def listdate_ical(self):
-        """Return string version of a date compatible with iCalendar DTSTART etc."""
+        """Return version of a date compatible with iCalendar DTSTART."""
         return self.date_from_str(self.datestr).strftime("%Y%m%dT233000Z")
 
     @property

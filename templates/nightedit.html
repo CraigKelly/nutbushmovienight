@@ -18,9 +18,16 @@
         <input type="datetime" class="form-control" name="moviedate" id="moviedate" placeholder="Movie Night Date" value="{{ movienight.datestr }}">
         </div>
 
-        <div class="form-group">
-        <label for="movieimdbid" class="control-label">IMDB ID</label>
-        <input type="text" class="form-control" name="movieimdbid" id="movieimdbid" placeholder="IMDB ID" value="{{ movienight.imdbid }}">
+        <div class="row">
+            <div class="form-group col-md-9">
+            <label for="movieimdbid" class="control-label">IMDB ID</label>
+            <input type="text" class="form-control" name="movieimdbid" id="movieimdbid" placeholder="IMDB ID" value="{{ movienight.imdbid }}">
+            </div>
+
+            <div class="form-group col-md-3">
+            <label for="movieimdbid" class="control-label">CCSI</label>
+            <input type="text" class="form-control" name="movieccsi" id="movieccsi" placeholder="CCSI" value="{{ movienight.ccsi }}">
+            </div>
         </div>
 
         <div class="form-group">

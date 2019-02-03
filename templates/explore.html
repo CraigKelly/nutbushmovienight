@@ -63,7 +63,7 @@
         var omdb = _.prop(movie.extdata, 'omdb');
     %>
         <div class="col-md-4">
-        <div class="panel panel-primary">
+        <div class="panel panel-primary" data-ccsi="<%= night.ccsi%>">
             <div class="panel-heading">
                 <div class="panel-title">
                     <a href="/night/<%= night.datestr%>">
