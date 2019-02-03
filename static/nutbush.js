@@ -146,3 +146,32 @@ _.mixin({
         });
     };
 })(module("data"));
+
+//////////////////////////////////////////////////////////////////////////
+// CCSI help
+
+(function(namespace){
+    namespace.ccsi_effect = function(selector, none_class, some_class, lots_class) {
+        $(selector).each(function(idx, ele){
+            ele = $(ele);
+            var ccsi = ele.attr("data-ccsi");
+            if (!ccsi) {
+                return;
+            }
+
+            ccsi = parseInt(ccsi, 10);
+            var cls;
+            if (isNaN(ccsi) || ccsi <= 0) {
+                cls = none_class;
+            } else if (ccsi <= 2) {
+                cls = some_class;
+            } else {
+                cls = lots_class;
+            }
+
+            console.log(idx, ele, "::", ccsi, "==>", cls);
+            ele.removeClass(none_class + ' ' + some_class + ' ' + lots_class);
+            ele.addClass(cls);
+        });
+    };
+})(module("data"));

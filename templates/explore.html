@@ -63,7 +63,7 @@
         var omdb = _.prop(movie.extdata, 'omdb');
     %>
         <div class="col-md-4">
-        <div class="panel panel-primary" data-ccsi="<%= night.ccsi%>">
+        <div class="night-header panel panel-primary" data-ccsi="<%= night.ccsi%>">
             <div class="panel-heading">
                 <div class="panel-title">
                     <a href="/night/<%= night.datestr%>">
@@ -129,7 +129,12 @@
         $("#search-results-container").append(
             searchResultsTemplate({'results': results})
         );
-        movieAutoClickSetup();  // Handle auto click elements we just created
+
+        // Handle auto click elements we just created
+        movieAutoClickSetup();
+
+        // CCSI effects
+        data.ccsi_effect('.night-header', 'panel-primary', 'panel-warning', 'panel-danger');
     }
 
     $(function() {

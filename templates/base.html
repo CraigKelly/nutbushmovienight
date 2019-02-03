@@ -159,7 +159,7 @@
             <div class="row">
                 {% for mn in movienights %}
                     <div class="col-md-6">
-                    <div class="panel panel-primary" data-ccsi="{{mn.ccsi}}">
+                    <div class="panel panel-primary night-header" data-ccsi="{{mn.ccsi}}">
                         <div class="panel-heading">
                             <div class="panel-title">
                                 <a href="{{url_for('main.night_display', datestr=mn.datestr)}}">
@@ -376,6 +376,9 @@
 
         // Provide a class-based way for buttons to show movies
         movieAutoClickSetup();
+
+        // CCSI effects
+        data.ccsi_effect('.night-header', 'panel-primary', 'panel-warning', 'panel-danger');
     });
 </script>
 
