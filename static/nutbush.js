@@ -169,7 +169,7 @@ _.mixin({
                 cls = lots_class;
             }
 
-            console.log(idx, ele, "::", ccsi, "==>", cls);
+            // console.log(idx, ele, "::", ccsi, "==>", cls);
             ele.removeClass(none_class + ' ' + some_class + ' ' + lots_class);
             ele.addClass(cls);
         });

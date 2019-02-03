@@ -61,7 +61,11 @@ app.register_blueprint(lawyer)
 @app.before_request
 def setup():
     """One-time setup work."""
-    setattr(g, 'year', datetime.now().year)
+    now = datetime.now()
+    # Current year is mainly for our copyright message
+    setattr(g, 'year', now.year)
+    # Current timestamp is useful for lots of stuff
+    setattr(g, 'timestamp', int(now.timestamp()))
 
 
 def database_config():
