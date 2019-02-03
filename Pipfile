@@ -8,12 +8,13 @@ python_version = "3.6"
 
 [dev-packages]
 nose = "*"
+pylint = "*"
 
 [packages]
 flask = ">=0.12.3"
 blinker = "*"
 flask-dance = "*"
-gludb = {editable = true, git = "https://github.com/memphis-iis/GLUDB"}
+gludb = {editable = true,git = "https://github.com/memphis-iis/GLUDB"}
 "psycopg2" = "*"
 pymongo = "*"
 requests = "*"
