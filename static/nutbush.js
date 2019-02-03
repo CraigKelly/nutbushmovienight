@@ -161,9 +161,9 @@ _.mixin({
 
             ccsi = parseInt(ccsi, 10);
             var cls;
-            if (isNaN(ccsi) || ccsi <= 0) {
+            if (isNaN(ccsi) || ccsi <= 1) {
                 cls = none_class;
-            } else if (ccsi <= 2) {
+            } else if (ccsi <= 3) {
                 cls = some_class;
             } else {
                 cls = lots_class;
