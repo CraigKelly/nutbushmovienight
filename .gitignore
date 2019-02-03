@@ -11,6 +11,7 @@ current.config
 .testingdb.sqlite
 __pycache__/
 postgresql-import.log
+.vscode
 
 # We actually have this committed to git, but we want .gitignore-aware tools
 # to exclude it (e.g. todo-show in Atom)
