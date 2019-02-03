@@ -143,7 +143,6 @@
 
         $("#cmdsave").click(function(event){
             event.preventDefault();
-            // TODO: validation
             $("#override-form")
                 .attr("action", "{{url_for('main.movie_override_save', imdbid=over.imdbID)}}")
                 .submit();

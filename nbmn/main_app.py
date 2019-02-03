@@ -325,7 +325,6 @@ def validate_night(night):
         yield "Need at least 2 attendees"
     if not night.moviename:
         yield "Please enter *something* for the movie name"
-    # TODO: might want to validate that ccsi is a number here
 
 
 def do_night_edit(night, mode):
