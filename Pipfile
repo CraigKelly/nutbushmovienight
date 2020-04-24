@@ -10,6 +10,7 @@ python_version = "3.7"
 nose = "*"
 pylint = "*"
 pep8 = "*"
+autopep8 = "*"
 
 [packages]
 flask = ">=0.12.3"
