@@ -106,7 +106,6 @@ auth = OAuth2ConsumerBlueprint(
     authorized_url=None,
     authorization_url_params={},
     session_class=None,
-    backend=None,
 )
 
 auth.from_config["client_id"] = "GOOGLE_CLIENT_ID"
