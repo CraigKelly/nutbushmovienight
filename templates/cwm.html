@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% macro cwm_episode_embed(epi, epi_title, epi_link) %}
+    <div class="col-md-4 col-sm-12">
+    <div class="panel panel-primary night-header">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <a href="{{epi_link}}" target="cwmtab">
+                    {{epi}}: {{epi_title}}
+                </a>
+
+            </div>
+        </div>
+        <div class="panel-body embed-me">
+            {{epi_link}}
+        </div>
+    </div>
+    </div>
+{% endmacro %}
+
+{% block title %} Cooking with Marty {% endblock %}
+{% block display_title %}Cooking with Marty{% endblock %}
+{% block display_title_sub %}A Retrospective{% endblock %}
+{% block main_content %}
+
+<div class="row">
+    {{ cwm_episode_embed("CWM 1", "Episode 1", "https://vimeo.com/23885981") }}
+    {{ cwm_episode_embed("CWM 2", "Episode 2", "https://youtu.be/tdiXkP-8oYI") }}
+    {{ cwm_episode_embed("CWM 3", "Episode 3", "https://youtu.be/oIStlMQb4b4") }}
+    {{ cwm_episode_embed("CWM 4", "A New Hope", "https://www.youtube.com/watch?v=f-LLnBZWoug") }}
+    {{ cwm_episode_embed("CWM 5", "The Lost Tapes", "https://www.youtube.com/watch?v=gsi-92Ktgfs") }}
+    {{ cwm_episode_embed("CWM 6", "Behind the Cooking", "https://www.youtube.com/watch?v=RQLFaECYCN4") }}
+    {{ cwm_episode_embed("CWM 7", "???", "https://www.youtube.com/watch?v=dQw4w9WgXcQ") }}
+    {{ cwm_episode_embed("CWM 8", "Phoning It In", "https://www.youtube.com/watch?v=5VlCssiC5Vo") }}
+    {{ cwm_episode_embed("CWM 9", "???", "https://www.youtube.com/watch?v=dQw4w9WgXcQ") }}
+    {{ cwm_episode_embed("CWM 10", "Cooking with Marty Episode 10", "https://www.youtube.com/watch?v=Zk2vg7inKno") }}
+    {{ cwm_episode_embed("CWM 11", "Episode 11", "https://vimeo.com/19513485") }}
+    {{ cwm_episode_embed("CWM 12", "Episode 12", "https://vimeo.com/19813861") }}
+    {{ cwm_episode_embed("CWM 13", "Marty Must Die", "https://www.youtube.com/watch?v=jex1FJ0nqSA") }}
+    {{ cwm_episode_embed("CWM 14", "CWMXIV", "https://vimeo.com/25184088") }}
+    {{ cwm_episode_embed("CWM 15", "CWMXV", "https://vimeo.com/236938041") }}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+var videoEmbed = {
+    invoke: function(){
+        $('.embed-me').html(function(i, html) {
+            return videoEmbed.convertMedia(html);
+        });
+
+    },
+    convertMedia: function(html){
+        var vimeo_patt = /(?:http?s?:\/\/)?(?:www\.)?(?:vimeo\.com)\/?(.+)/g;
+        var youtube_patt = /(?:http?s?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/g;
+
+        if(vimeo_patt.test(html)){
+           var replacement = '<iframe width="210" height="162" src="//player.vimeo.com/video/$1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+
+           var html = html.replace(vimeo_patt, replacement);
+        }
+
+        if(youtube_patt.test(html)){
+              var replacement = '<iframe width="260" height="162" src="http://www.youtube.com/embed/$1" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+              var html = html.replace(youtube_patt, replacement);
+        }
+
+        return html;
+    }
+}
+
+$(function(){
+    videoEmbed.invoke();
+})
+</script>
+{% endblock %}

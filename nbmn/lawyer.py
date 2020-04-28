@@ -29,6 +29,7 @@ def make_vanilla_template(route, template_name):
 make_vanilla_template("/about",   "about.html")
 make_vanilla_template("/faq",     "faq.html")
 make_vanilla_template("/tos",     "tos.html")
+make_vanilla_template("/cwm",     "cwm.html")
 
 
 # Some static routes for files that a nice website should provide
