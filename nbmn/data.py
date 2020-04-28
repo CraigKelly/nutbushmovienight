@@ -8,8 +8,7 @@ from operator import attrgetter
 
 from flask import Blueprint, jsonify, make_response, render_template, request, url_for
 
-import werkzeug.contrib.atom as atom
-
+from .atom import AtomFeed
 from .utils import templated, use_error_page
 from .model import Night, Movie, Attendee
 
@@ -47,7 +46,7 @@ def explore_data():
 
 @data.route('/nights.atom')
 def atom_nights():
-    feed = atom.AtomFeed(
+    feed = AtomFeed(
         title='Nutbush Movie Night',
         title_type='text',
         subtitle='All Movie Nights',

@@ -4,12 +4,13 @@ url = "https://pypi.python.org/simple"
 name = "pypi"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
 
 [dev-packages]
 nose = "*"
 pylint = "*"
 pep8 = "*"
+autopep8 = "*"
 
 [packages]
 flask = ">=0.12.3"
