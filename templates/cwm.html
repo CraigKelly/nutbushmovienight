@@ -57,13 +57,13 @@ var videoEmbed = {
         var youtube_patt = /(?:http?s?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/g;
 
         if(vimeo_patt.test(html)){
-           var replacement = '<iframe width="210" height="162" src="//player.vimeo.com/video/$1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+           var replacement = '<iframe width="260" height="162" src="//player.vimeo.com/video/$1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
 
            var html = html.replace(vimeo_patt, replacement);
         }
 
         if(youtube_patt.test(html)){
-              var replacement = '<iframe width="260" height="162" src="http://www.youtube.com/embed/$1" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+              var replacement = '<iframe width="260" height="162" src="https://www.youtube.com/embed/$1" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
               var html = html.replace(youtube_patt, replacement);
         }
 
