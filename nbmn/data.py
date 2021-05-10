@@ -22,7 +22,7 @@ def _to_dict(obj):
 
 def _movie_dict(movie):
     d = _to_dict(movie)
-    d['extdata']['Poster'] = url_for('main.movie_image', imdbkey=movie.imdbid)
+    d['extdata']['Poster'] = f'https://nutbushposters.fly.dev/{movie.imdbid}'
     return d
 
 
@@ -51,7 +51,7 @@ def atom_nights():
         title_type='text',
         subtitle='All Movie Nights',
         author=sorted(Attendee.OLIGARCHS),
-        feed_url=request.url,
+        feed_url=request.url, # TODO: replace http: with https:
         url=request.url_root,
         logo=url_for('static', filename='logo.png'),
     )

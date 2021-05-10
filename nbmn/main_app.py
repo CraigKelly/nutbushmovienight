@@ -48,7 +48,7 @@ def main_page():
     nights = nights[:MAX_NIGHTS]
 
     for night in nights:
-        night.thumb = url_for('main.movie_image', imdbkey=night.imdbid)
+        night.thumb = f'https://nutbushposters.fly.dev/{night.imdbid}'
 
     return {
         'movienights': nights
@@ -73,7 +73,7 @@ def movie_display(moviekey=None):
         if not movie:
             return None
         movie.urlname = movie.imdbid
-        movie.poster = url_for('main.movie_image', imdbkey=movie.imdbid)
+        movie.poster = f'https://nutbushposters.fly.dev/{movie.imdbid}'
         return movie
 
     if moviekey:
@@ -92,7 +92,7 @@ def movie_data(imdbkey):
     movie = Movie.find_by_imdb(imdbkey)
     if not movie:
         abort(404)
-    movie.extdata['Poster'] = url_for('main.movie_image', imdbkey=movie.imdbid)
+    movie.extdata['Poster'] = f'https://nutbushposters.fly.dev/{movie.imdbid}'
     return jsonify(**movie.extdata)
 
 
