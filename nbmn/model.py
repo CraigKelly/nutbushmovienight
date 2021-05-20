@@ -160,7 +160,8 @@ class MovieOverride(Movie):
         if not dbobj:
             # Whoops - not even in database
             return None
-        elif len(dbobj) > 1:
+
+        if len(dbobj) > 1:
             # We only want one object.
             app_logger().warning("Dup movies found for IMDB id %s", imdbid)
             for xtra in dbobj[1:]:
@@ -170,7 +171,8 @@ class MovieOverride(Movie):
                 )
                 xtra.delete()
 
-        return dbobj[0]
+        data = dbobj[0]
+        return data
 
 
 @DBObject(table_name="Attendees")

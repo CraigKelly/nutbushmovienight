@@ -33,6 +33,25 @@ from .slack import notify
 main = Blueprint('main', __name__)
 
 
+def calc_movie_poster(movie):
+    """Set poster: but honor manual overrides
+    Note that without a manual override, the poster will be set to use
+    the nutbushposters service"""
+    if isinstance(movie, str):
+        imdbid = movie
+        movie = Movie.find_by_imdb(imdbid)
+    else:
+        imdbid = movie.imdbid
+
+    ext = movie.extdata.get('omdb', {}) if movie else {}
+    poster = ''
+    if int(ext.get('ManualOverride', 0)):
+        poster = ext.get('Poster', '')
+    if not poster:
+        poster = f'https://nutbushposters.fly.dev/{imdbid}'
+    return poster
+
+
 @main.route('/')
 @templated("base.html")
 @use_error_page
@@ -48,7 +67,7 @@ def main_page():
     nights = nights[:MAX_NIGHTS]
 
     for night in nights:
-        night.thumb = f'https://nutbushposters.fly.dev/{night.imdbid}'
+        night.thumb = calc_movie_poster(night.imdbid)
 
     return {
         'movienights': nights
@@ -72,8 +91,10 @@ def movie_display(moviekey=None):
     def fixup(movie):
         if not movie:
             return None
+
         movie.urlname = movie.imdbid
-        movie.poster = f'https://nutbushposters.fly.dev/{movie.imdbid}'
+        movie.poster = calc_movie_poster(movie)
+
         return movie
 
     if moviekey:
@@ -92,7 +113,7 @@ def movie_data(imdbkey):
     movie = Movie.find_by_imdb(imdbkey)
     if not movie:
         abort(404)
-    movie.extdata['Poster'] = f'https://nutbushposters.fly.dev/{movie.imdbid}'
+    movie.extdata['Poster'] = calc_movie_poster(movie)
     return jsonify(**movie.extdata)
 
 
@@ -100,44 +121,7 @@ def movie_data(imdbkey):
 @logged_errors
 def movie_image(imdbkey):
     """Movie image retrieval via remote API."""
-    movie = Movie.find_by_imdb(imdbkey)
-    if not movie:
-        abort(404)
-
-    local_path = project_file('static/posters/%s.jpg' % movie.imdbid)
-    if isfile(local_path):
-        buffer_image = open(local_path, "rb")
-        mimetype = 'image/jpeg'
-        imgsrc = 'Local Disk (%s)' % local_path
-    else:
-        r = create_omdb_poster_get(imdbkey)
-        if r.status_code == 200:
-            buffer_image = BytesIO(r.content)
-            buffer_image.seek(0)
-            mimetype = r.headers['Content-Type']
-            imgsrc = 'OMDB Poster API'
-        else:
-            app_logger().warn('Poster API %s found nothing (%s)', movie.imdbid, str(r.status_code))
-            poster = movie.extdata.get('omdb', {}).get('Poster', '')
-            r = None
-            if poster:
-                r = requests.get(poster)
-
-            if r and r.status_code == 200:
-                buffer_image = BytesIO(r.content)
-                buffer_image.seek(0)
-                mimetype = r.headers['Content-Type']
-                imgsrc = 'OMDB Post Link in Data'
-            else:
-                app_logger().warn('No Poster Link in data for %s', movie.imdbid)
-                local_path = project_file('static/default_movie_thumb.png')
-                buffer_image = open(local_path, 'rb')
-                mimetype = 'image/png'
-                imgsrc = 'Default Poster (%s)' % local_path
-
-    app_logger().info('Send image for %s from %s', movie.imdbid, imgsrc)
-
-    return send_file(buffer_image, mimetype=mimetype)
+    return redirect(calc_movie_poster(imdbkey), code=302)
 
 
 @main.route('/badmovie/<imdbkey>')
@@ -420,6 +404,9 @@ def movie_override_save(imdbid):
     over = _default_override(imdbid)
     for fld in FIELDS:
         over[fld] = request.form.get(fld, '')
+
+    # People might want to know this is an override
+    over['ManualOverride'] = '1'
 
     movie_over.extdata = {
         "omdb": over,

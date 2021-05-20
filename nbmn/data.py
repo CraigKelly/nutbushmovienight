@@ -22,7 +22,10 @@ def _to_dict(obj):
 
 def _movie_dict(movie):
     d = _to_dict(movie)
-    d['extdata']['Poster'] = f'https://nutbushposters.fly.dev/{movie.imdbid}'
+    ext = d['extdata']
+    # Don't manually set poster if there was an override
+    if not int(ext.get('ManualOverride', '0')):
+        ext['Poster'] = f'https://nutbushposters.fly.dev/{movie.imdbid}'
     return d
 
 
