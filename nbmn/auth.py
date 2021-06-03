@@ -110,6 +110,7 @@ auth = OAuth2ConsumerBlueprint(
 
 auth.from_config["client_id"] = "GOOGLE_CLIENT_ID"
 auth.from_config["client_secret"] = "GOOGLE_CLIENT_SECRET"
+auth.from_config["redirect_url"] = "GOOGLE_REDIRECT_URL"
 
 
 @auth.before_app_request
