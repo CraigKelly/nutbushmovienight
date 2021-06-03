@@ -18,6 +18,7 @@ import logging
 from datetime import datetime
 
 from flask import Flask, g
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from gludb.config import default_database, Database
 
@@ -29,6 +30,8 @@ from nbmn.main_app import main
 from nbmn.data import data
 from nbmn.lawyer import lawyer
 
+app = Flask(__name__)
+
 # Create app and handle configuration
 app = Flask(__name__)
 app.config.from_pyfile('default.config')
@@ -38,6 +41,11 @@ app.secret_key = app.config.get('FLASK_SECRET', None)
 # Handle debug flag from config file - and let them use anything truthy to
 # our DEBUG flag
 app.debug = True if app.config.get('DEBUG', None) else False
+
+# If we aren't running debug, then use the proxy fix so that redirects work
+# for oauth (making sure that they are HTTPS)
+if not app.debug:
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # Set up logging
 log.setup(level=logging.DEBUG if app.debug else logging.INFO)
