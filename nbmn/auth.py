@@ -15,10 +15,13 @@ except ImportError:
     from flask import _request_ctx_stack as stack
 
 from flask_dance.consumer import (
+    OAuth2Session,
     OAuth2ConsumerBlueprint,
     oauth_authorized,
     oauth_error
 )
+from flask_dance.utils import invalidate_cached_property
+from urlobject import URLObject
 
 from gludb.utils import now_field
 
@@ -90,6 +93,32 @@ def require_login(func):
     return wrapper
 
 
+class CustomOAuth2Session(OAuth2Session):
+    """This hacky class is here because for whatever reason the Proxy fix for
+    Flask isn't working with flask_dance. Ugh, should have just written my own
+    to start.
+    """
+    def __init__(self, blueprint=None, base_url=None, *args, **kwargs):
+        self._redirect_uri = kwargs.get('redirect_uri', None)
+        super().__init__(*args, **kwargs)
+        self.blueprint = blueprint
+        self.base_url = URLObject(base_url)
+        invalidate_cached_property(self, "token")
+
+    @property
+    def redirect_uri(self):
+        return self._redirect_uri
+
+    @redirect_uri.setter
+    def redirect_uri(self, url):
+        new_uri = (url or '')
+        if not ('localhost' in new_uri or '127.0.0' in new_uri):
+            new_uri = new_uri.replace("http:", "https:")
+        if new_uri != self._redirect_uri:
+            app_logger().debug("ouath2 redirect_uri changing from %s to %s", new_uri, self._redirect_uri)
+        self._redirect_uri = new_uri
+
+
 # Make the google blueprint (taken from their contrib code)
 auth = OAuth2ConsumerBlueprint(
     "auth",
@@ -105,12 +134,11 @@ auth = OAuth2ConsumerBlueprint(
     login_url=None,
     authorized_url=None,
     authorization_url_params={},
-    session_class=None,
+    session_class=CustomOAuth2Session,
 )
 
 auth.from_config["client_id"] = "GOOGLE_CLIENT_ID"
 auth.from_config["client_secret"] = "GOOGLE_CLIENT_SECRET"
-auth.from_config["redirect_url"] = "GOOGLE_REDIRECT_URL"
 
 
 @auth.before_app_request
