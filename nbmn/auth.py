@@ -125,7 +125,7 @@ auth = OAuth2ConsumerBlueprint(
     __name__,
     client_id=None,  # Handled via app config
     client_secret=None,  # Handled via app config
-    scope=["profile", "email"],
+    scope=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"],
     base_url="https://www.googleapis.com/",
     authorization_url="https://accounts.google.com/o/oauth2/auth",
     token_url="https://accounts.google.com/o/oauth2/token",
@@ -165,16 +165,19 @@ def log_in_event(blueprint, token):
     if not token:
         return login_fail("Failed to log in")
 
+    app_logger().debug("getting userinfo from Google")
     resp = blueprint.session.get("/oauth2/v1/userinfo")
     if not resp.ok:
         return login_fail("Failed to login user!")
 
+    app_logger().debug("recvd userinfo from Google - parsing")
     data = resp.json()
 
     email = data.get('email', '')
     if not email:
         return login_fail("Google failed to supply an email address")
 
+    app_logger().debug("looking for userinfo email %s", email)
     users = User.find_by_index('index_email', email)
     if users:
         user = users[0]  # Always first found
@@ -182,6 +185,7 @@ def log_in_event(blueprint, token):
         user = User(email=email)
 
     # Update the user info and save the session info
+    app_logger().debug("Updating db with user %s info", email)
     user.name = data.get('name', email)
     user.photo = data.get('picture', '/static/anonymous_person.png')
     user.logins.append(now_field())
