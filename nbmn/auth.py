@@ -20,7 +20,6 @@ from flask_dance.consumer import (
     oauth_authorized,
     oauth_error
 )
-from flask_dance.utils import invalidate_cached_property
 from urlobject import URLObject
 
 from gludb.utils import now_field
@@ -103,7 +102,8 @@ class CustomOAuth2Session(OAuth2Session):
         super().__init__(*args, **kwargs)
         self.blueprint = blueprint
         self.base_url = URLObject(base_url)
-        invalidate_cached_property(self, "token")
+        if getattr(self, "token"):
+            del self.token
 
     @property
     def redirect_uri(self):
@@ -115,7 +115,7 @@ class CustomOAuth2Session(OAuth2Session):
         if not ('localhost' in new_uri or '127.0.0' in new_uri):
             new_uri = new_uri.replace("http:", "https:")
         if new_uri != self._redirect_uri:
-            app_logger().debug("ouath2 redirect_uri changing from %s to %s", new_uri, self._redirect_uri)
+            app_logger().debug("oauth2 redirect_uri changing from %s to %s", self._redirect_uri, new_uri)
         self._redirect_uri = new_uri
 
 
