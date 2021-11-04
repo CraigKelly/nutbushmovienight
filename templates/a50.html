@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %} Adam Turns 50 {% endblock %}
+{% block display_title %}Adam Turns 50{% endblock %}
+{% block display_title_sub %}Gary Fuckin Busey{% endblock %}
+{% block main_content %}
+
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="panel panel-primary night-header">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    Gary Helps Us Out
+                </div>
+            </div>
+            <div class="panel-body embed-me">
+                <video controls>
+                    <source src="https://bart.binarydolphin.com/adam-birthday-video.mkv"
+                            type="video/x-matroska">
+
+                    <source src="https://bart.binarydolphin.com/adam-birthday-video.mp4"
+                            type="video/mp4">
+
+                    Sorry, your browser doesn't support embedded videos.
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

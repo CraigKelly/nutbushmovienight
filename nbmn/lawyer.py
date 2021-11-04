@@ -30,6 +30,7 @@ make_vanilla_template("/about",   "about.html")
 make_vanilla_template("/faq",     "faq.html")
 make_vanilla_template("/tos",     "tos.html")
 make_vanilla_template("/cwm",     "cwm.html")
+make_vanilla_template("/a50",     "a50.html")
 
 
 # Some static routes for files that a nice website should provide
