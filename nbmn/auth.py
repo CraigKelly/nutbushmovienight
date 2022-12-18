@@ -4,10 +4,9 @@ import os
 import sys
 import traceback
 
-from functools import partial, wraps
+from functools import wraps
 
 from flask import redirect, request, flash, abort, g, url_for
-from flask.globals import LocalProxy, _lookup_app_object
 
 try:
     from flask import _app_ctx_stack as stack
@@ -146,8 +145,6 @@ def set_applocal_session():
     """Make sure we can see the google oauth in the session."""
     ctx = stack.top
     ctx.google_oauth = auth.session
-
-google_api = LocalProxy(partial(_lookup_app_object, "google_oauth"))
 
 
 def login_fail(msg):

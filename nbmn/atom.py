@@ -27,7 +27,7 @@ import warnings
 from datetime import datetime
 
 from werkzeug.utils import escape
-from werkzeug.wrappers import BaseResponse
+from werkzeug.wrappers import Response
 
 warnings.warn(
     "'werkzeug.contrib.atom' is deprecated as of version 0.15 and will"
@@ -226,7 +226,7 @@ class AtomFeed(object):
 
     def get_response(self):
         """Return a response object for the feed."""
-        return BaseResponse(self.to_string(), mimetype="application/atom+xml")
+        return Response(self.to_string(), mimetype="application/atom+xml")
 
     def __call__(self, environ, start_response):
         """Use the class as WSGI response object."""
