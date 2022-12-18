@@ -18,7 +18,7 @@ blinker = "*"
 flask-dance = "*"
 gludb = {editable = true,git = "https://github.com/memphis-iis/GLUDB"}
 "psycopg2" = "*"
-pymongo = "*"
+pymongo = ">=3.13.0,<4.0.0"
 requests = "*"
 waitress = "*"
 daiquiri = "*"
